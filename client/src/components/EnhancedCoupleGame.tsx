@@ -122,23 +122,32 @@ export default function EnhancedCoupleGame() {
     setTimerActive(false);
     
     let winnerPlayer: 1 | 2;
+    let newPlayer1Score = player1.score;
+    let newPlayer2Score = player2.score;
     
     if (gameState === 'won' && !forceLoss) {
       // Adivinhador ganhou
-      winnerPlayer = 1; // Simplificado: Jogador 1 é sempre o adivinhador
+      winnerPlayer = 1;
+      newPlayer1Score++;
       setPlayer1(prev => ({ ...prev, score: prev.score + 1 }));
       playSound('victory');
     } else {
       // Desafiante ganhou ou tempo esgotado
-      winnerPlayer = 2; // Jogador 2 é sempre o desafiante
+      winnerPlayer = 2;
+      newPlayer2Score++;
       setPlayer2(prev => ({ ...prev, score: prev.score + 1 }));
       playSound('defeat');
-      
-      // Show punishment for loser
-      const punishment = getRandomPunishment();
-      if (punishment) {
-        setCurrentPunishment(punishment);
-        setShowPunishment(true);
+    }
+    
+    // Only show punishment when match ends (someone reaches 2 wins)
+    if (newPlayer1Score === 2 || newPlayer2Score === 2) {
+      const loser = newPlayer1Score === 2 ? 2 : 1;
+      if (loser === 1) { // Adivinhador perdeu a partida
+        const punishment = getRandomPunishment();
+        if (punishment) {
+          setCurrentPunishment(punishment);
+          setShowPunishment(true);
+        }
       }
     }
     
@@ -257,25 +266,75 @@ export default function EnhancedCoupleGame() {
     }
   };
 
-  // Auto-setup effect - skip names screen
-  useEffect(() => {
-    if (gamePhase === 'setup') {
-      setPlayer1({ name: 'Jogador 1', score: 0 });
-      setPlayer2({ name: 'Jogador 2', score: 0 });
+  // Setup state for names
+  const [tempPlayer1Name, setTempPlayer1Name] = useState('');
+  const [tempPlayer2Name, setTempPlayer2Name] = useState('');
+
+  const handleSetupComplete = () => {
+    if (tempPlayer1Name.trim() && tempPlayer2Name.trim()) {
+      setPlayer1({ name: tempPlayer1Name.trim(), score: 0 });
+      setPlayer2({ name: tempPlayer2Name.trim(), score: 0 });
       setGamePhase('word-input');
     }
-  }, [gamePhase]);
+  };
 
-  // Setup Phase - Skip names, go directly to word input
+  // Setup Phase - Names input
   if (gamePhase === 'setup') {
     return (
-      <div className="max-w-2xl mx-auto space-y-6 p-4">
+      <div className="max-w-lg mx-auto space-y-6 p-4">
         <Card className="bg-black/20 backdrop-blur-sm border-white/10">
-          <CardContent className="p-6 text-center">
-            <div className="animate-pulse">
-              <Heart className="h-12 w-12 text-pink-400 mx-auto mb-4" />
-              <p className="text-white text-lg">Iniciando Jogo do Casal...</p>
+          <CardHeader className="text-center">
+            <CardTitle className="text-white text-2xl flex items-center justify-center gap-2">
+              <Heart className="h-6 w-6 text-pink-400" />
+              Jogo do Casal
+            </CardTitle>
+            <div className="text-white/70 text-sm mt-2">
+              Melhor de 3 rodadas - Digite os nomes dos jogadores
             </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-3">
+              <div>
+                <label className="text-white text-sm font-bold block mb-2">
+                  🧠 Nome do ADIVINHADOR:
+                </label>
+                <Input
+                  value={tempPlayer1Name}
+                  onChange={(e) => setTempPlayer1Name(e.target.value)}
+                  placeholder="Ex: Ana, João..."
+                  className="bg-green-500/10 border-green-500/30 text-white placeholder-white/50"
+                  maxLength={15}
+                />
+                <div className="text-green-300 text-xs mt-1">
+                  Vai descobrir as palavras secretas
+                </div>
+              </div>
+              
+              <div>
+                <label className="text-white text-sm font-bold block mb-2">
+                  🎯 Nome do DESAFIANTE:
+                </label>
+                <Input
+                  value={tempPlayer2Name}
+                  onChange={(e) => setTempPlayer2Name(e.target.value)}
+                  placeholder="Ex: Carlos, Maria..."
+                  className="bg-blue-500/10 border-blue-500/30 text-white placeholder-white/50"
+                  maxLength={15}
+                />
+                <div className="text-blue-300 text-xs mt-1">
+                  Vai escolher as palavras secretas
+                </div>
+              </div>
+            </div>
+            
+            <Button
+              onClick={handleSetupComplete}
+              className="w-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 py-3"
+              disabled={!tempPlayer1Name.trim() || !tempPlayer2Name.trim()}
+            >
+              <Play className="h-4 w-4 mr-2" />
+              Começar Jogo
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -293,10 +352,10 @@ export default function EnhancedCoupleGame() {
               Rodada {roundNumber}
             </CardTitle>
             <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/50 mt-2">
-              🎯 DESAFIANTE: Você escolhe a palavra secreta
+              🎯 {player2.name} - DESAFIANTE: Escolha uma palavra secreta
             </Badge>
             <div className="text-white/60 text-xs mt-2 bg-blue-500/10 rounded p-2">
-              O desafiante escolhe uma palavra que o outro jogador deve adivinhar
+              {player2.name} escolhe uma palavra que {player1.name} deve adivinhar
             </div>
           </CardHeader>
           <CardContent>
@@ -530,7 +589,7 @@ export default function EnhancedCoupleGame() {
               <div>
                 <Trophy className="h-12 w-12 text-yellow-400 mx-auto mb-4" />
                 <h3 className="text-2xl text-white font-bold mb-2">
-                  {isChallenger ? getOtherPlayerInfo().name : getCurrentPlayerInfo().name} Ganhou!
+                  {player1.name} (Adivinhador) Ganhou!
                 </h3>
                 <p className="text-white/70 mb-4">
                   A palavra era: <span className="text-white font-mono">{secretWord}</span>
@@ -540,13 +599,14 @@ export default function EnhancedCoupleGame() {
               <div>
                 <Heart className="h-12 w-12 text-red-400 mx-auto mb-4" />
                 <h3 className="text-2xl text-white font-bold mb-2">
-                  {isChallenger ? getCurrentPlayerInfo().name : getOtherPlayerInfo().name} Ganhou!
+                  {player2.name} (Desafiante) Ganhou!
                 </h3>
                 <p className="text-white/70 mb-4">
                   A palavra era: <span className="text-white font-mono">{secretWord}</span>
                 </p>
                 <p className="text-pink-300 text-sm">
-                  {timeLeft === 0 ? 'Tempo esgotado! ' : ''}Alguém deve cumprir um castigo! 😈
+                  {timeLeft === 0 ? 'Tempo esgotado! ' : ''}
+                  {(player1.score < 2 && player2.score < 2) ? 'Só castigo no final! 😈' : 'Hora do castigo! 😈'}
                 </p>
               </div>
             )}
@@ -563,10 +623,10 @@ export default function EnhancedCoupleGame() {
               <div className="mt-6 space-y-4">
                 <div className="text-center">
                   <h2 className="text-3xl font-bold text-yellow-400 mb-2">
-                    🏆 {player1.score === 2 ? 'ADIVINHADOR' : 'DESAFIANTE'} VENCEU!
+                    🏆 {player1.score === 2 ? player1.name : player2.name} VENCEU!
                   </h2>
                   <p className="text-white text-lg">
-                    Melhor de 3: {player1.score} x {player2.score}
+                    Melhor de 3: {player1.name} {player1.score} x {player2.score} {player2.name}
                   </p>
                 </div>
                 <Button
