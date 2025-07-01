@@ -38,29 +38,31 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
           {/* Navigation Header */}
-          <Card className="mb-8 p-4 bg-black/20 backdrop-blur-sm border-white/10">
-            <div className="flex justify-between items-center">
-              <h1 className="text-3xl font-bold text-white flex items-center gap-2">
-                <GamepadIcon className="h-8 w-8" />
-                Jogo da Forca Adulto
+          <Card className="mb-4 sm:mb-8 p-3 sm:p-4 bg-black/20 backdrop-blur-sm border-white/10">
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-0">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white flex items-center gap-2">
+                <GamepadIcon className="h-6 w-6 sm:h-8 sm:w-8" />
+                <span className="text-center sm:text-left">Jogo da Forca Adulto</span>
               </h1>
               
-              <div className="flex gap-2">
+              <div className="flex gap-2 w-full sm:w-auto">
                 <Button
                   variant={currentView === 'game' ? 'default' : 'outline'}
                   onClick={() => setCurrentView('game')}
-                  className="text-white border-white/20"
+                  className="text-white border-white/20 flex-1 sm:flex-none"
+                  size="sm"
                 >
                   Jogar
                 </Button>
                 <Button
                   variant={currentView === 'admin' ? 'default' : 'outline'}
                   onClick={() => setCurrentView('admin')}
-                  className="text-white border-white/20"
+                  className="text-white border-white/20 flex-1 sm:flex-none"
+                  size="sm"
                 >
-                  <Shield className="h-4 w-4 mr-2" />
+                  <Shield className="h-4 w-4 mr-1 sm:mr-2" />
                   Admin
                 </Button>
               </div>

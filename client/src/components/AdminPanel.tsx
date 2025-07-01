@@ -3,17 +3,29 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { Badge } from "./ui/badge";
 import { useAdmin } from "../lib/stores/useAdmin";
 import { useWords } from "../lib/stores/useWords";
-import { Lock, Plus, Trash2, Eye, EyeOff } from "lucide-react";
+import { usePunishments, Punishment } from "../lib/stores/usePunishments";
+import { Lock, Plus, Trash2, Eye, EyeOff, Heart, Clock } from "lucide-react";
 
 export default function AdminPanel() {
   const { isAuthenticated, login, logout } = useAdmin();
   const { words, addWord, removeWord } = useWords();
+  const { punishments, addPunishment, removePunishment } = usePunishments();
   const [password, setPassword] = useState("");
   const [newWord, setNewWord] = useState("");
   const [loginError, setLoginError] = useState("");
   const [showWords, setShowWords] = useState(false);
+  const [showPunishments, setShowPunishments] = useState(false);
+  
+  // States for new punishment form
+  const [newPunishmentTitle, setNewPunishmentTitle] = useState("");
+  const [newPunishmentDescription, setNewPunishmentDescription] = useState("");
+  const [newPunishmentCategory, setNewPunishmentCategory] = useState<"leve" | "moderado" | "intenso">("leve");
+  const [newPunishmentType, setNewPunishmentType] = useState<"acao" | "posicao" | "fetiche" | "preliminar" | "dominacao">("acao");
+  const [newPunishmentDuration, setNewPunishmentDuration] = useState("");
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,6 +50,44 @@ export default function AdminPanel() {
   const handleRemoveWord = (word: string) => {
     if (confirm(`Tem certeza que deseja remover "${word}"?`)) {
       removeWord(word);
+    }
+  };
+
+  const handleAddPunishment = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newPunishmentTitle.trim() && newPunishmentDescription.trim()) {
+      addPunishment({
+        title: newPunishmentTitle.trim(),
+        description: newPunishmentDescription.trim(),
+        category: newPunishmentCategory,
+        type: newPunishmentType,
+        duration: newPunishmentDuration.trim() || undefined
+      });
+      // Reset form
+      setNewPunishmentTitle("");
+      setNewPunishmentDescription("");
+      setNewPunishmentDuration("");
+      setNewPunishmentCategory("leve");
+      setNewPunishmentType("acao");
+    }
+  };
+
+  const handleRemovePunishment = (id: string, title: string) => {
+    if (confirm(`Tem certeza que deseja remover o castigo "${title}"?`)) {
+      removePunishment(id);
+    }
+  };
+
+  const getCategoryColor = (category: string) => {
+    switch (category) {
+      case "leve":
+        return "bg-green-500/20 text-green-300 border-green-500/50";
+      case "moderado":
+        return "bg-yellow-500/20 text-yellow-300 border-yellow-500/50";
+      case "intenso":
+        return "bg-red-500/20 text-red-300 border-red-500/50";
+      default:
+        return "bg-gray-500/20 text-gray-300 border-gray-500/50";
     }
   };
 
@@ -85,13 +135,13 @@ export default function AdminPanel() {
       <Card className="bg-black/20 backdrop-blur-sm border-white/10">
         <CardHeader>
           <div className="flex justify-between items-center">
-            <CardTitle className="text-white">Word Management</CardTitle>
+            <CardTitle className="text-white">Gerenciamento de Palavras</CardTitle>
             <Button
               onClick={logout}
               variant="outline"
               className="text-white border-white/20"
             >
-              Logout
+              Sair
             </Button>
           </div>
         </CardHeader>
@@ -102,7 +152,7 @@ export default function AdminPanel() {
         <CardHeader>
           <CardTitle className="text-white flex items-center gap-2">
             <Plus className="h-5 w-5" />
-            Add New Word
+            Adicionar Nova Palavra
           </CardTitle>
         </CardHeader>
         

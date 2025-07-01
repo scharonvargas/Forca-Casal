@@ -1,8 +1,8 @@
-# Adult Hangman Game
+# Jogo da Forca Adulto para Casais
 
 ## Overview
 
-This is a full-stack web application implementing an adult-themed hangman game. The application features a React frontend with TypeScript, an Express.js backend, and uses PostgreSQL with Drizzle ORM for data persistence. The game includes age verification, word management through an admin panel, and comprehensive game statistics tracking.
+Este é um aplicativo web completo implementando um jogo da forca temático adulto especialmente desenvolvido para casais. A aplicação possui interface React com TypeScript, backend Express.js, e utiliza PostgreSQL com Drizzle ORM para persistência de dados. O jogo inclui verificação de idade, sistema de castigos sexuais para quem perde, gerenciamento de palavras e castigos através de painel administrativo, e rastreamento abrangente de estatísticas do jogo. O design é totalmente responsivo para dispositivos móveis.
 
 ## System Architecture
 

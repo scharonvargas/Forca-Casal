@@ -38,8 +38,8 @@ export default function AgeVerification({ onVerify }: AgeVerificationProps) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-900 via-purple-900 to-indigo-900 p-4">
-      <Card className="w-full max-w-md bg-black/40 backdrop-blur-sm border-red-500/50">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-900 via-purple-900 to-indigo-900 p-3 sm:p-4">
+      <Card className="w-full max-w-sm sm:max-w-md bg-black/40 backdrop-blur-sm border-red-500/50">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
             <AlertTriangle className="h-16 w-16 text-red-400" />
