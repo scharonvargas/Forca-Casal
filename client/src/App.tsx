@@ -44,7 +44,7 @@ function App() {
             <div className="flex justify-between items-center">
               <h1 className="text-3xl font-bold text-white flex items-center gap-2">
                 <GamepadIcon className="h-8 w-8" />
-                Adult Hangman
+                Jogo da Forca Adulto
               </h1>
               
               <div className="flex gap-2">
@@ -53,7 +53,7 @@ function App() {
                   onClick={() => setCurrentView('game')}
                   className="text-white border-white/20"
                 >
-                  Play Game
+                  Jogar
                 </Button>
                 <Button
                   variant={currentView === 'admin' ? 'default' : 'outline'}

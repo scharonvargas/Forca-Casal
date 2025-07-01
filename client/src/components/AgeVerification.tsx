@@ -20,12 +20,12 @@ export default function AgeVerification({ onVerify }: AgeVerificationProps) {
     const age = currentYear - year;
     
     if (isNaN(year) || year < 1900 || year > currentYear) {
-      setError("Please enter a valid birth year");
+      setError("Por favor, digite um ano de nascimento válido");
       return;
     }
     
     if (age < 18) {
-      setError("You must be 18 or older to access this content");
+      setError("Você deve ter 18 anos ou mais para acessar este conteúdo");
       return;
     }
     
@@ -45,15 +45,15 @@ export default function AgeVerification({ onVerify }: AgeVerificationProps) {
             <AlertTriangle className="h-16 w-16 text-red-400" />
           </div>
           <CardTitle className="text-2xl font-bold text-white">
-            Age Verification Required
+            Verificação de Idade Obrigatória
           </CardTitle>
         </CardHeader>
         
         <CardContent>
           <div className="mb-6 p-4 bg-red-500/20 rounded-lg border border-red-500/30">
             <p className="text-white text-sm text-center">
-              This content contains adult themes and is intended for mature audiences only.
-              You must be 18 years or older to proceed.
+              Este conteúdo contém temas adultos e é destinado apenas a audiências maduras.
+              Você deve ter 18 anos ou mais para prosseguir.
             </p>
           </div>
 
@@ -61,7 +61,7 @@ export default function AgeVerification({ onVerify }: AgeVerificationProps) {
             <div>
               <label htmlFor="birthYear" className="block text-sm font-medium text-white mb-2">
                 <Calendar className="h-4 w-4 inline mr-2" />
-                Enter your birth year:
+                Digite seu ano de nascimento:
               </label>
               <input
                 type="number"
@@ -89,7 +89,7 @@ export default function AgeVerification({ onVerify }: AgeVerificationProps) {
                 onClick={handleDecline}
                 className="flex-1 text-white border-white/30 hover:bg-white/10"
               >
-                I'm Under 18
+                Tenho Menos de 18
               </Button>
               <Button
                 type="submit"
