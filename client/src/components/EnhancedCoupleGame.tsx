@@ -374,15 +374,15 @@ export default function EnhancedCoupleGame() {
   const timePercentage = (timeLeft / 60) * 100;
 
   return (
-    <div className="max-w-6xl mx-auto space-y-4 p-4">
-      {/* Header with Timer - Mobile Optimized */}
+    <div className="max-w-6xl mx-auto space-y-2 p-2">
+      {/* Header with Timer - Compacto */}
       <Card className="bg-black/20 backdrop-blur-sm border-white/10">
-        <CardContent className="p-3">
+        <CardContent className="p-2">
           <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <div className="text-center">
-                <Crown className="h-5 w-5 text-yellow-400 mx-auto mb-1" />
-                <div className="text-white font-bold text-sm">Rodada {roundNumber}/3</div>
+                <Crown className="h-4 w-4 text-yellow-400 mx-auto mb-1" />
+                <div className="text-white font-bold text-xs">Rodada {roundNumber}/3</div>
                 <div className="text-white/60 text-xs">Melhor de 3</div>
               </div>
               
@@ -418,12 +418,12 @@ export default function EnhancedCoupleGame() {
         </CardContent>
       </Card>
 
-      {/* Players Info - Mobile Optimized */}
+      {/* Players Info - Compacto */}
       <Card className="bg-black/20 backdrop-blur-sm border-white/10">
-        <CardContent className="p-3">
+        <CardContent className="p-2">
           <div className="flex items-center justify-between gap-2">
             {/* Current Player */}
-            <div className={`flex-1 p-3 rounded-lg border-2 text-center transition-all ${
+            <div className={`flex-1 p-2 rounded-lg border-2 text-center transition-all ${
               isChallenger 
                 ? 'border-blue-500 bg-blue-500/20' 
                 : 'border-green-500 bg-green-500/20'
@@ -452,7 +452,7 @@ export default function EnhancedCoupleGame() {
             <div className="text-white/40 text-lg">VS</div>
 
             {/* Other Player */}
-            <div className="flex-1 p-3 rounded-lg border-2 border-white/20 bg-white/5 text-center">
+            <div className="flex-1 p-2 rounded-lg border-2 border-white/20 bg-white/5 text-center">
               <div className="flex items-center justify-center gap-1 mb-1">
                 {!isChallenger ? (
                   <Sword className="h-4 w-4 text-white/40" />
@@ -476,38 +476,35 @@ export default function EnhancedCoupleGame() {
 
 
       {/* FORCA NO TOPO - Layout Mobile */}
-      <div className="space-y-3">
-        {/* 1. FORCA SEMPRE NO TOPO */}
+      <div className="space-y-2">
+        {/* 1. FORCA SEMPRE NO TOPO - MAIOR E MAIS DESTACADA */}
         <Card className="bg-black/20 backdrop-blur-sm border-white/10">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-white text-center">🎯 Forca</CardTitle>
-          </CardHeader>
-          <CardContent className="p-4">
+          <CardContent className="p-2">
             <div className="flex justify-center">
-              <div className="w-64 h-64">
+              <div className="w-72 h-72 md:w-80 md:h-80">
                 <HangmanCanvas wrongGuesses={wrongGuesses} />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* 2. PALAVRA SECRETA */}
+        {/* 2. PALAVRA SECRETA - MAIS COMPACTA */}
         <Card className="bg-black/20 backdrop-blur-sm border-white/10">
-          <CardContent className="p-4 text-center">
-            <div className="mb-3">
-              <div className="text-white/70 text-sm mb-2">Palavra Secreta:</div>
-              <div className="text-2xl font-mono text-white tracking-widest bg-white/10 rounded-lg p-4">
+          <CardContent className="p-3 text-center">
+            <div className="mb-2">
+              <div className="text-white/70 text-xs mb-1">Palavra Secreta:</div>
+              <div className="text-xl md:text-2xl font-mono text-white tracking-widest bg-white/10 rounded-lg p-3">
                 {getDisplayWord()}
               </div>
             </div>
             
-            <div className="flex items-center justify-center gap-4 text-sm">
+            <div className="flex items-center justify-center gap-3 text-xs">
               <div>
-                <Heart className="h-4 w-4 text-red-400 inline mr-1" />
+                <Heart className="h-3 w-3 text-red-400 inline mr-1" />
                 <span className="text-white">Erros: {wrongGuesses}/6</span>
               </div>
               <div>
-                <span className={`px-3 py-1 rounded ${
+                <span className={`px-2 py-1 rounded text-xs ${
                   gameState === 'playing' ? 'bg-green-500/20 text-green-300' :
                   gameState === 'won' ? 'bg-blue-500/20 text-blue-300' :
                   'bg-red-500/20 text-red-300'
