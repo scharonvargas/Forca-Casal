@@ -1,5 +1,5 @@
-// Default adult-themed words for the hangman game
-// This is a simplified example - in a real app, you'd want a more extensive database
+// Palavras padrão com temática adulta para o jogo da forca
+// Este é um exemplo simplificado - em um app real, você gostaria de um banco de dados mais extenso
 export const getDefaultWords = (): string[] => {
   return [
     // Palavras românticas/adultas temáticas (mantendo o bom gosto)
