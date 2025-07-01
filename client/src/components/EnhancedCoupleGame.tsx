@@ -37,6 +37,7 @@ export default function EnhancedCoupleGame() {
   const [currentPlayer, setCurrentPlayer] = useState<1 | 2>(1);
   const [isChallenger, setIsChallenger] = useState(true);
   const [roundNumber, setRoundNumber] = useState(1);
+  const [maxRounds] = useState(3); // Melhor de 3
   
   // Game phases
   const [gamePhase, setGamePhase] = useState<'setup' | 'word-input' | 'playing' | 'result'>('setup');
@@ -120,26 +121,18 @@ export default function EnhancedCoupleGame() {
   const handleGameEnd = (forceLoss = false) => {
     setTimerActive(false);
     
+    let winnerPlayer: 1 | 2;
+    
     if (gameState === 'won' && !forceLoss) {
-      // Guesser wins
-      const winnerPlayer = isChallenger ? 
-        (currentPlayer === 1 ? 2 : 1) : currentPlayer;
-      
-      if (winnerPlayer === 1) {
-        setPlayer1(prev => ({ ...prev, score: prev.score + 1 }));
-      } else {
-        setPlayer2(prev => ({ ...prev, score: prev.score + 1 }));
-      }
+      // Adivinhador ganhou
+      winnerPlayer = 1; // Simplificado: Jogador 1 é sempre o adivinhador
+      setPlayer1(prev => ({ ...prev, score: prev.score + 1 }));
+      playSound('victory');
     } else {
-      // Challenger wins or time up
-      const winnerPlayer = isChallenger ? 
-        currentPlayer : (currentPlayer === 1 ? 2 : 1);
-      
-      if (winnerPlayer === 1) {
-        setPlayer1(prev => ({ ...prev, score: prev.score + 1 }));
-      } else {
-        setPlayer2(prev => ({ ...prev, score: prev.score + 1 }));
-      }
+      // Desafiante ganhou ou tempo esgotado
+      winnerPlayer = 2; // Jogador 2 é sempre o desafiante
+      setPlayer2(prev => ({ ...prev, score: prev.score + 1 }));
+      playSound('defeat');
       
       // Show punishment for loser
       const punishment = getRandomPunishment();
@@ -148,10 +141,17 @@ export default function EnhancedCoupleGame() {
         setShowPunishment(true);
       }
     }
+    
     setGamePhase('result');
   };
 
   const handleNextRound = () => {
+    // Check if someone won the match (melhor de 3)
+    if (player1.score === 2 || player2.score === 2) {
+      // Game over - someone won the match
+      return;
+    }
+    
     setCurrentPlayer(prev => prev === 1 ? 2 : 1);
     setIsChallenger(prev => !prev);
     setRoundNumber(prev => prev + 1);
@@ -213,9 +213,47 @@ export default function EnhancedCoupleGame() {
     }
   };
 
+  const playSound = (type: 'correct' | 'wrong' | 'victory' | 'defeat') => {
+    try {
+      const audio = new Audio();
+      switch (type) {
+        case 'correct':
+          // Som de acerto - frequência alta positiva
+          audio.src = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmIWAC2WzfHCdSoFl2++8eecSA'; // Simplified beep sound
+          break;
+        case 'wrong':
+          // Som de erro - frequência baixa
+          audio.src = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmIWAC2WzfHCdSoFl2++8eecSA';
+          break;
+        case 'victory':
+          // Som de vitória
+          audio.src = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmIWAC2WzfHCdSoFl2++8eecSA';
+          break;
+        case 'defeat':
+          // Som de derrota
+          audio.src = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmIWAC2WzfHCdSoFl2++8eecSA';
+          break;
+      }
+      audio.volume = 0.3;
+      audio.play().catch(() => {}); // Ignore errors if audio fails
+    } catch (error) {
+      // Ignore audio errors
+    }
+  };
+
   const handleLetterGuess = (letter: string) => {
     if (gameState === 'playing' && timerActive) {
+      const wasCorrect = currentWord.toUpperCase().includes(letter);
       guessLetter(letter);
+      
+      // Play sound after a short delay to let the game state update
+      setTimeout(() => {
+        if (wasCorrect) {
+          playSound('correct');
+        } else {
+          playSound('wrong');
+        }
+      }, 100);
     }
   };
 
@@ -255,8 +293,11 @@ export default function EnhancedCoupleGame() {
               Rodada {roundNumber}
             </CardTitle>
             <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/50 mt-2">
-              Desafiante - Escolha uma palavra
+              🎯 DESAFIANTE: Você escolhe a palavra secreta
             </Badge>
+            <div className="text-white/60 text-xs mt-2 bg-blue-500/10 rounded p-2">
+              O desafiante escolhe uma palavra que o outro jogador deve adivinhar
+            </div>
           </CardHeader>
           <CardContent>
             <SecretWordInputForm 
@@ -282,7 +323,8 @@ export default function EnhancedCoupleGame() {
             <div className="flex items-center gap-3">
               <div className="text-center">
                 <Crown className="h-5 w-5 text-yellow-400 mx-auto mb-1" />
-                <div className="text-white font-bold text-sm">Rodada {roundNumber}</div>
+                <div className="text-white font-bold text-sm">Rodada {roundNumber}/3</div>
+                <div className="text-white/60 text-xs">Melhor de 3</div>
               </div>
               
               {/* Timer - More prominent on mobile */}
@@ -434,10 +476,17 @@ export default function EnhancedCoupleGame() {
               disabled={gameState !== 'playing' || !timerActive}
             />
             
-            <div className="mt-4 text-center py-2 bg-green-500/10 rounded-lg">
-              <p className="text-green-300 text-sm">
-                💡 Clique nas letras para adivinhar a palavra!
-              </p>
+            <div className="mt-4 space-y-2">
+              <div className="text-center py-2 bg-green-500/10 rounded-lg">
+                <p className="text-green-300 text-sm">
+                  💡 Clique nas letras para adivinhar a palavra!
+                </p>
+              </div>
+              <div className="text-center py-2 bg-blue-500/10 rounded-lg">
+                <p className="text-blue-300 text-xs">
+                  🎮 REGRAS: ADIVINHADOR descobre a palavra | DESAFIANTE escolhe a palavra | Melhor de 3 rodadas
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -502,13 +551,33 @@ export default function EnhancedCoupleGame() {
               </div>
             )}
             
-            <Button
-              onClick={handleNextRound}
-              className="mt-6 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
-            >
-              <ArrowRight className="h-4 w-4 mr-2" />
-              Próxima Rodada
-            </Button>
+            {(player1.score < 2 && player2.score < 2) ? (
+              <Button
+                onClick={handleNextRound}
+                className="mt-6 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+              >
+                <ArrowRight className="h-4 w-4 mr-2" />
+                Próxima Rodada ({roundNumber + 1}/3)
+              </Button>
+            ) : (
+              <div className="mt-6 space-y-4">
+                <div className="text-center">
+                  <h2 className="text-3xl font-bold text-yellow-400 mb-2">
+                    🏆 {player1.score === 2 ? 'ADIVINHADOR' : 'DESAFIANTE'} VENCEU!
+                  </h2>
+                  <p className="text-white text-lg">
+                    Melhor de 3: {player1.score} x {player2.score}
+                  </p>
+                </div>
+                <Button
+                  onClick={handleNewGame}
+                  className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 py-3"
+                >
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Nova Partida
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
