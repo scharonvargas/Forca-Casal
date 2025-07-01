@@ -45,7 +45,7 @@ export default function GameStats() {
 
         <div className="text-center pt-2">
           <div className="text-sm text-white/60">
-            Total Games: {stats.totalGames}
+            Total de Jogos: {stats.totalGames}
           </div>
         </div>
       </CardContent>

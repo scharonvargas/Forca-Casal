@@ -21,7 +21,7 @@ export default function AdminPanel() {
     
     const success = login(password);
     if (!success) {
-      setLoginError("Invalid password");
+      setLoginError("Senha inválida");
     } else {
       setPassword("");
     }
@@ -36,7 +36,7 @@ export default function AdminPanel() {
   };
 
   const handleRemoveWord = (word: string) => {
-    if (confirm(`Are you sure you want to remove "${word}"?`)) {
+    if (confirm(`Tem certeza que deseja remover "${word}"?`)) {
       removeWord(word);
     }
   };
@@ -46,7 +46,7 @@ export default function AdminPanel() {
       <Card className="max-w-md mx-auto bg-black/20 backdrop-blur-sm border-white/10">
         <CardHeader className="text-center">
           <Lock className="h-12 w-12 text-white mx-auto mb-4" />
-          <CardTitle className="text-white">Admin Login</CardTitle>
+          <CardTitle className="text-white">Login do Admin</CardTitle>
         </CardHeader>
         
         <CardContent>
@@ -54,7 +54,7 @@ export default function AdminPanel() {
             <div>
               <Input
                 type="password"
-                placeholder="Enter admin password"
+                placeholder="Digite a senha do admin"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="bg-white/10 border-white/20 text-white placeholder-white/50"
