@@ -96,13 +96,10 @@ export default function EnhancedCoupleGame() {
     const newPlayer2 = { name: p2Name, score: 0 };
     setPlayer1(newPlayer1);
     setPlayer2(newPlayer2);
-    console.log('Players set:', newPlayer1, newPlayer2);
     setGamePhase('word-input');
   };
 
   const handleWordSet = (word: string) => {
-    console.log('Word set:', word);
-    console.log('Current player:', currentPlayer, 'isChallenger:', isChallenger);
     setSecretWord(word);
     newGame(word);
     setGamePhase('playing');
@@ -272,23 +269,23 @@ export default function EnhancedCoupleGame() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-4 p-4">
-      {/* Header with New Game Button */}
+      {/* Header with Timer - Mobile Optimized */}
       <Card className="bg-black/20 backdrop-blur-sm border-white/10">
-        <CardContent className="p-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-4">
+        <CardContent className="p-3">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-3">
               <div className="text-center">
-                <Crown className="h-6 w-6 text-yellow-400 mx-auto mb-1" />
-                <div className="text-white font-bold">Rodada {roundNumber}</div>
+                <Crown className="h-5 w-5 text-yellow-400 mx-auto mb-1" />
+                <div className="text-white font-bold text-sm">Rodada {roundNumber}</div>
               </div>
               
-              {/* Timer */}
-              <div className="flex items-center gap-2">
-                <Timer className={`h-5 w-5 ${timeLeft > 20 ? 'text-green-400' : timeLeft > 10 ? 'text-yellow-400' : 'text-red-400'}`} />
-                <div className="text-white font-mono text-lg">
+              {/* Timer - More prominent on mobile */}
+              <div className="flex flex-col items-center bg-black/30 rounded-lg p-2 min-w-[80px]">
+                <Timer className={`h-4 w-4 mb-1 ${timeLeft > 20 ? 'text-green-400' : timeLeft > 10 ? 'text-yellow-400' : 'text-red-400'}`} />
+                <div className={`font-mono font-bold text-lg ${timeLeft > 20 ? 'text-green-400' : timeLeft > 10 ? 'text-yellow-400' : 'text-red-400'}`}>
                   {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}
                 </div>
-                <div className={`w-24 h-2 rounded-full bg-white/20 overflow-hidden`}>
+                <div className="w-16 h-1 rounded-full bg-white/20 overflow-hidden mt-1">
                   <div 
                     className={`h-full transition-all duration-1000 ${
                       timeLeft > 20 ? 'bg-green-400' : 
@@ -303,175 +300,172 @@ export default function EnhancedCoupleGame() {
             <Button
               onClick={handleNewGame}
               variant="outline"
-              className="text-white border-white/20 hover:bg-white/10"
+              size="sm"
+              className="text-white border-white/20 hover:bg-white/10 text-xs"
             >
-              <RefreshCw className="h-4 w-4 mr-2" />
+              <RefreshCw className="h-3 w-3 mr-1" />
               Nova Partida
             </Button>
           </div>
         </CardContent>
       </Card>
 
-      {/* Players Info */}
+      {/* Players Info - Mobile Optimized */}
       <Card className="bg-black/20 backdrop-blur-sm border-white/10">
-        <CardContent className="p-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CardContent className="p-3">
+          <div className="flex items-center justify-between gap-2">
             {/* Current Player */}
-            <div className={`p-4 rounded-lg border-2 text-center transition-all ${
+            <div className={`flex-1 p-3 rounded-lg border-2 text-center transition-all ${
               isChallenger 
                 ? 'border-blue-500 bg-blue-500/20' 
                 : 'border-green-500 bg-green-500/20'
             }`}>
-              <div className="flex items-center justify-center gap-2 mb-2">
+              <div className="flex items-center justify-center gap-1 mb-1">
                 {isChallenger ? (
-                  <Sword className="h-5 w-5 text-blue-400" />
+                  <Sword className="h-4 w-4 text-blue-400" />
                 ) : (
-                  <Target className="h-5 w-5 text-green-400" />
+                  <Target className="h-4 w-4 text-green-400" />
                 )}
-                <User className="h-4 w-4 text-white" />
               </div>
-              <h3 className="text-white font-bold">{getCurrentPlayerInfo().name}</h3>
-              <Badge className={
+              <h3 className="text-white font-bold text-sm mb-1">{getCurrentPlayerInfo().name}</h3>
+              <Badge className={`text-xs mb-1 ${
                 isChallenger 
                   ? 'bg-blue-500/20 text-blue-300 border-blue-500/50' 
                   : 'bg-green-500/20 text-green-300 border-green-500/50'
-              }>
+              }`}>
                 {isChallenger ? 'Desafiante' : 'Adivinhador'}
               </Badge>
-              <div className="mt-2">
-                <Trophy className="h-4 w-4 text-yellow-400 inline mr-1" />
-                <span className="text-white font-bold">{getCurrentPlayerInfo().score}</span>
+              <div className="flex items-center justify-center gap-1">
+                <Trophy className="h-3 w-3 text-yellow-400" />
+                <span className="text-white font-bold text-sm">{getCurrentPlayerInfo().score}</span>
               </div>
             </div>
+
+            <div className="text-white/40 text-lg">VS</div>
 
             {/* Other Player */}
-            <div className="p-4 rounded-lg border-2 border-white/20 bg-white/5 text-center">
-              <div className="flex items-center justify-center gap-2 mb-2">
+            <div className="flex-1 p-3 rounded-lg border-2 border-white/20 bg-white/5 text-center">
+              <div className="flex items-center justify-center gap-1 mb-1">
                 {!isChallenger ? (
-                  <Sword className="h-5 w-5 text-white/40" />
+                  <Sword className="h-4 w-4 text-white/40" />
                 ) : (
-                  <Target className="h-5 w-5 text-white/40" />
+                  <Target className="h-4 w-4 text-white/40" />
                 )}
-                <User className="h-4 w-4 text-white/40" />
               </div>
-              <h3 className="text-white/70 font-bold">{getOtherPlayerInfo().name}</h3>
-              <Badge className="bg-white/10 text-white/60 border-white/20">
+              <h3 className="text-white/70 font-bold text-sm mb-1">{getOtherPlayerInfo().name}</h3>
+              <Badge className="bg-white/10 text-white/60 border-white/20 text-xs mb-1">
                 {!isChallenger ? 'Desafiante' : 'Adivinhador'}
               </Badge>
-              <div className="mt-2">
-                <Trophy className="h-4 w-4 text-white/40 inline mr-1" />
-                <span className="text-white/70 font-bold">{getOtherPlayerInfo().score}</span>
+              <div className="flex items-center justify-center gap-1">
+                <Trophy className="h-3 w-3 text-white/40" />
+                <span className="text-white/70 font-bold text-sm">{getOtherPlayerInfo().score}</span>
               </div>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Game Status */}
-      <Card className="bg-black/20 backdrop-blur-sm border-white/10">
-        <CardContent className="p-4 text-center">
-          <div className="mb-4">
-            <div className="text-white/70 text-sm mb-2">Palavra Secreta:</div>
-            <div className="text-2xl font-mono text-white tracking-widest bg-white/10 rounded-lg p-3">
-              {getDisplayWord()}
-            </div>
-          </div>
-          
-          <div className="flex items-center justify-center gap-4 text-sm">
-            <div>
-              <Heart className="h-4 w-4 text-red-400 inline mr-1" />
-              <span className="text-white">Erros: {wrongGuesses}/6</span>
-            </div>
-            <div>
-              <span className={`px-2 py-1 rounded ${
-                gameState === 'playing' ? 'bg-green-500/20 text-green-300' :
-                gameState === 'won' ? 'bg-blue-500/20 text-blue-300' :
-                'bg-red-500/20 text-red-300'
-              }`}>
-                {gameState === 'playing' ? 'Jogando' :
-                 gameState === 'won' ? 'Ganhou!' : 'Perdeu!'}
-              </span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
 
-      {/* Game Area */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Hangman Canvas */}
+
+      {/* Mobile-First Game Area */}
+      <div className="space-y-4">
+        {/* Main Game Section - Forca and Word Display */}
         <Card className="bg-black/20 backdrop-blur-sm border-white/10">
-          <CardHeader>
-            <CardTitle className="text-white text-center">Forca</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <HangmanCanvas wrongGuesses={wrongGuesses} />
+          <CardContent className="p-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+              {/* Hangman Canvas */}
+              <div className="flex justify-center">
+                <div className="w-48 h-48 md:w-56 md:h-56">
+                  <HangmanCanvas wrongGuesses={wrongGuesses} />
+                </div>
+              </div>
+              
+              {/* Game Info */}
+              <div className="space-y-4 text-center md:text-left">
+                <div>
+                  <div className="text-white/70 text-sm mb-2">Palavra Secreta:</div>
+                  <div className="text-xl md:text-2xl font-mono text-white tracking-widest bg-white/10 rounded-lg p-3">
+                    {getDisplayWord()}
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-center md:justify-start gap-4 text-sm">
+                  <div>
+                    <Heart className="h-4 w-4 text-red-400 inline mr-1" />
+                    <span className="text-white">Erros: {wrongGuesses}/6</span>
+                  </div>
+                  <div>
+                    <span className={`px-2 py-1 rounded ${
+                      gameState === 'playing' ? 'bg-green-500/20 text-green-300' :
+                      gameState === 'won' ? 'bg-blue-500/20 text-blue-300' :
+                      'bg-red-500/20 text-red-300'
+                    }`}>
+                      {gameState === 'playing' ? 'Jogando' :
+                       gameState === 'won' ? 'Ganhou!' : 'Perdeu!'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
-        {/* Game Controls */}
-        <div className="space-y-4">
-          {/* Hints System */}
-          {!isChallenger && gameState === 'playing' && (
-            <Card className="bg-black/20 backdrop-blur-sm border-white/10">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
-                  <Lightbulb className="h-5 w-5 text-yellow-400" />
-                  Dicas ({hintsUsed}/3)
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {revealedHints.map((hint, index) => (
-                  <div key={index} className="p-2 bg-green-500/20 border border-green-500/50 rounded text-green-300 text-sm">
-                    {hint}
-                  </div>
-                ))}
-                
-                {hintsUsed < 3 && (
-                  <Button
-                    onClick={handleUseHint}
-                    className="w-full bg-yellow-600 hover:bg-yellow-700"
-                    disabled={!timerActive}
-                  >
-                    <Clock className="h-4 w-4 mr-2" />
-                    Usar Dica (-10 segundos)
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Keyboard */}
-          <Card className="bg-black/20 backdrop-blur-sm border-white/10">
-            <CardHeader>
-              <CardTitle className="text-white">
-                {isChallenger ? 'Aguarde...' : 'Sua vez!'}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="mb-4">
-                <p className="text-white/60 text-xs">
-                  Debug: isChallenger={isChallenger.toString()}, gameState={gameState}, timerActive={timerActive.toString()}
+        {/* Keyboard Section */}
+        <Card className="bg-black/20 backdrop-blur-sm border-white/10">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-white text-center">
+              {isChallenger ? 'Aguarde sua vez...' : 'Escolha uma letra'}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {!isChallenger ? (
+              <Keyboard
+                onLetterClick={handleLetterGuess}
+                guessedLetters={guessedLetters}
+                currentWord={currentWord}
+                disabled={gameState !== 'playing' || !timerActive}
+              />
+            ) : (
+              <div className="text-center py-6">
+                <Sword className="h-10 w-10 text-blue-400 mx-auto mb-3" />
+                <p className="text-white text-lg mb-2">Você é o Desafiante!</p>
+                <p className="text-white/70 text-sm">
+                  Aguarde {getOtherPlayerInfo().name} adivinhar...
                 </p>
               </div>
-              {!isChallenger ? (
-                <Keyboard
-                  onLetterClick={handleLetterGuess}
-                  guessedLetters={guessedLetters}
-                  currentWord={currentWord}
-                  disabled={gameState !== 'playing' || !timerActive}
-                />
-              ) : (
-                <div className="text-center py-8">
-                  <Sword className="h-12 w-12 text-blue-400 mx-auto mb-4" />
-                  <p className="text-white text-lg mb-2">Você é o Desafiante!</p>
-                  <p className="text-white/70 text-sm">
-                    Aguarde {getOtherPlayerInfo().name} adivinhar...
-                  </p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Hints System */}
+        {!isChallenger && gameState === 'playing' && (
+          <Card className="bg-black/20 backdrop-blur-sm border-white/10">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-white flex items-center justify-center gap-2">
+                <Lightbulb className="h-5 w-5 text-yellow-400" />
+                Dicas Disponíveis ({hintsUsed}/3)
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {revealedHints.map((hint, index) => (
+                <div key={index} className="p-3 bg-green-500/20 border border-green-500/50 rounded-lg text-green-300 text-sm">
+                  {hint}
                 </div>
+              ))}
+              
+              {hintsUsed < 3 && (
+                <Button
+                  onClick={handleUseHint}
+                  className="w-full bg-yellow-600 hover:bg-yellow-700 py-3"
+                  disabled={!timerActive}
+                >
+                  <Clock className="h-4 w-4 mr-2" />
+                  Usar Dica (-10 segundos)
+                </Button>
               )}
             </CardContent>
           </Card>
-        </div>
+        )}
       </div>
 
       {/* Game Result */}
