@@ -3,18 +3,21 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import AgeVerification from "./components/AgeVerification";
 import HangmanGame from "./components/HangmanGame";
 import AdminPanel from "./components/AdminPanel";
+import CoupleSetup from "./components/CoupleSetup";
 import { Button } from "./components/ui/button";
 import { Card } from "./components/ui/card";
 import { useAdmin } from "./lib/stores/useAdmin";
-import { Shield, GamepadIcon } from "lucide-react";
+import { useCouple } from "./lib/stores/useCouple";
+import { Shield, GamepadIcon, Heart, User } from "lucide-react";
 import "./index.css";
 
 const queryClient = new QueryClient();
 
 function App() {
   const [isAgeVerified, setIsAgeVerified] = useState(false);
-  const [currentView, setCurrentView] = useState<'game' | 'admin'>('game');
+  const [currentView, setCurrentView] = useState<'game' | 'admin' | 'modeSelect'>('modeSelect');
   const { isAuthenticated } = useAdmin();
+  const { gameMode, setGameMode, player1, player2 } = useCouple();
 
   // Check if user has already verified age in this session
   useEffect(() => {

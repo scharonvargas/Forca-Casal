@@ -1,0 +1,65 @@
+Contexto do código
+Você está trabalhando num aplicativo de Forca já funcional para um único jogador. Ele segue boas práticas e possui testes passando. Não altere a lógica existente: todo o fluxo single-player deve continuar intacto.
+
+Objetivo desta tarefa
+
+Adicionar um modo “duplas” (Desafiante × Adivinhador) conforme as regras abaixo, sem quebrar compatibilidade com o modo atual.
+
+Manter nomes de funções, rotas, estados e testes existentes; apenas estenda onde necessário.
+
+Regras que devem ser implementadas
+
+Papéis alternados: após cada rodada, troque automaticamente Desafiante ↔ Adivinhador.
+
+Palavra secreta
+
+Desafiante digita a palavra em input secreto (ou modal) → armazenar em memória/DB sem revelar.
+
+Gerar traços “_” para cada letra; mostrar espaços/acentos.
+
+Limite de erros configurável: default 6 partes, mas aceitar 6-10 via config na UI.
+
+Fluxo de turno
+
+Adivinhador envia uma letra por tentativa.
+
+Update dos traços ou desenhar parte do boneco.
+
+Permitir “chute da palavra completa”; erro conta como erro extra.
+
+Condições de vitória
+
+Vence quem cumprir sua condição antes do boneco acabar.
+
+Registrar pontuação (1 ponto por vitória) e exibir scoreboard simples.
+
+Categorias opcionais: permitir seleção de tema (ex.: “Animais”, “Filmes”).
+
+Modo cooperativo (extra, se houver tempo): dois jogadores tentam adivinhar palavra sorteada pelo sistema.
+
+Requisitos técnicos
+• Não refatore partes que já funcionam; só crie módulos/arquivos novos ou estenda componentes.
+• Siga o padrão de estilo existente (ESLint/Prettier, TypeScript, React, etc.).
+• Adicione testes unitários/integração cobrindo o novo fluxo de duplas sem afetar testes antigos.
+• Garantir cobertura mínima ≥ a atual.
+• Atualizar documentação (README ou Storybook) explicando como usar o modo duplas.
+
+Checklist antes de concluir
+
+Todos os testes (antigos + novos) passam.
+
+UI preserva aparência original; novos elementos seguem design-system/Tailwind existente.
+
+Sem breaking changes na API pública.
+
+Commits claros e atômicos.
+
+Saída esperada
+
+Código completo adicionado/modificado.
+
+Arquivos de teste novos/atualizados.
+
+Notas de migração, se aplicável.
+
+IMPORTANTE: pense antes de codar, implemente incrementalmente, valide localmente a cada passo e só depois prossiga.
