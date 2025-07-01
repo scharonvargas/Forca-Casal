@@ -117,12 +117,13 @@ export default function HangmanCanvas({ wrongGuesses }: HangmanCanvasProps) {
   }, [wrongGuesses]);
 
   return (
-    <div className="bg-black/30 rounded-lg p-4 border border-white/10">
+    <div className="bg-black/30 rounded-lg p-2 sm:p-4 border border-white/10 w-full">
       <canvas
         ref={canvasRef}
-        width={300}
-        height={300}
-        className="block mx-auto"
+        width={280}
+        height={280}
+        className="block mx-auto w-full h-auto max-w-[280px] max-h-[280px]"
+        style={{ imageRendering: 'pixelated' }}
       />
     </div>
   );

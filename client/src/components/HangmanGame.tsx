@@ -7,7 +7,7 @@ import GameStats from "./GameStats";
 import PunishmentModal from "./PunishmentModal";
 import { useHangman } from "../lib/stores/useHangman";
 import { useWords } from "../lib/stores/useWords";
-import { usePunishments } from "../lib/stores/usePunishments";
+import { usePunishments, Punishment } from "../lib/stores/usePunishments";
 import { RefreshCw, Trophy, Skull } from "lucide-react";
 
 export default function HangmanGame() {
@@ -22,6 +22,9 @@ export default function HangmanGame() {
   } = useHangman();
   
   const { getRandomWord } = useWords();
+  const { getRandomPunishment } = usePunishments();
+  const [showPunishment, setShowPunishment] = useState(false);
+  const [currentPunishment, setCurrentPunishment] = useState<Punishment | null>(null);
 
   // Start a new game when component mounts
   useEffect(() => {
@@ -30,6 +33,17 @@ export default function HangmanGame() {
       newGame(word);
     }
   }, []);
+
+  // Check for game end and show punishment for losses
+  useEffect(() => {
+    if (gameState === 'lost') {
+      const punishment = getRandomPunishment();
+      if (punishment) {
+        setCurrentPunishment(punishment);
+        setShowPunishment(true);
+      }
+    }
+  }, [gameState]);
 
   const handleLetterGuess = (letter: string) => {
     if (gameState === 'playing') {
@@ -66,66 +80,86 @@ export default function HangmanGame() {
   const gameMessage = getGameMessage();
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      {/* Game Stats */}
-      <div className="lg:col-span-1">
-        <GameStats />
-      </div>
+    <>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
+        {/* Game Stats - Hidden on mobile when playing */}
+        <div className={`lg:col-span-1 ${gameState === 'playing' ? 'hidden lg:block' : ''}`}>
+          <GameStats />
+        </div>
 
-      {/* Main Game Area */}
-      <div className="lg:col-span-2">
-        <Card className="bg-black/20 backdrop-blur-sm border-white/10">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl text-white">
-              {gameMessage ? (
-                <div className={`flex items-center justify-center gap-2 ${gameMessage.color}`}>
-                  {gameMessage.icon}
-                  {gameMessage.message}
+        {/* Main Game Area */}
+        <div className={`${gameState === 'playing' ? 'col-span-1' : 'lg:col-span-2'}`}>
+          <Card className="bg-black/20 backdrop-blur-sm border-white/10">
+            <CardHeader className="text-center p-4 lg:p-6">
+              <CardTitle className="text-xl lg:text-2xl text-white">
+                {gameMessage ? (
+                  <div className={`flex items-center justify-center gap-2 ${gameMessage.color} flex-wrap`}>
+                    {gameMessage.icon}
+                    <span className="text-center">{gameMessage.message}</span>
+                  </div>
+                ) : (
+                  "Adivinhe a Palavra"
+                )}
+              </CardTitle>
+            </CardHeader>
+
+            <CardContent className="space-y-4 lg:space-y-6 p-4 lg:p-6">
+              {/* Hangman Drawing */}
+              <div className="flex justify-center">
+                <div className="w-full max-w-xs lg:max-w-sm">
+                  <HangmanCanvas wrongGuesses={wrongGuesses} />
                 </div>
-              ) : (
-                "Adivinhe a Palavra"
-              )}
-            </CardTitle>
-          </CardHeader>
-
-          <CardContent className="space-y-6">
-            {/* Hangman Drawing */}
-            <div className="flex justify-center">
-              <HangmanCanvas wrongGuesses={wrongGuesses} />
-            </div>
-
-            {/* Current Word Display */}
-            <div className="text-center">
-              <div className="text-4xl font-mono font-bold text-white tracking-wider mb-4">
-                {getDisplayWord()}
               </div>
-              <div className="text-sm text-white/60">
-                Erros: {wrongGuesses}/6
+
+              {/* Current Word Display */}
+              <div className="text-center">
+                <div className="text-2xl lg:text-4xl font-mono font-bold text-white tracking-wider mb-2 lg:mb-4 break-all">
+                  {getDisplayWord()}
+                </div>
+                <div className="text-sm text-white/60">
+                  Erros: {wrongGuesses}/6
+                </div>
               </div>
-            </div>
 
-            {/* Keyboard */}
-            <Keyboard
-              onLetterClick={handleLetterGuess}
-              guessedLetters={guessedLetters}
-              currentWord={currentWord}
-              disabled={gameState !== 'playing'}
-            />
+              {/* Keyboard */}
+              <div className="w-full">
+                <Keyboard
+                  onLetterClick={handleLetterGuess}
+                  guessedLetters={guessedLetters}
+                  currentWord={currentWord}
+                  disabled={gameState !== 'playing'}
+                />
+              </div>
 
-            {/* New Game Button */}
-            <div className="flex justify-center pt-4">
-              <Button
-                onClick={handleNewGame}
-                className="bg-purple-600 hover:bg-purple-700 text-white"
-                size="lg"
-              >
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Novo Jogo
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+              {/* New Game Button */}
+              <div className="flex justify-center pt-2 lg:pt-4">
+                <Button
+                  onClick={handleNewGame}
+                  className="bg-purple-600 hover:bg-purple-700 text-white w-full lg:w-auto"
+                  size="lg"
+                >
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Novo Jogo
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Game Stats on mobile - shown after game ends */}
+        {gameState !== 'playing' && (
+          <div className="lg:hidden">
+            <GameStats />
+          </div>
+        )}
       </div>
-    </div>
+
+      {/* Punishment Modal */}
+      <PunishmentModal
+        isOpen={showPunishment}
+        onClose={() => setShowPunishment(false)}
+        punishment={currentPunishment}
+      />
+    </>
   );
 }

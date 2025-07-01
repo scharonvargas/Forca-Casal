@@ -27,14 +27,14 @@ export default function Keyboard({ onLetterClick, guessedLetters, currentWord, d
   };
 
   return (
-    <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-2 max-w-2xl mx-auto">
+    <div className="grid grid-cols-7 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-13 gap-1 sm:gap-2 max-w-4xl mx-auto">
       {letters.map((letter) => (
         <Button
           key={letter}
           variant={getButtonVariant(letter)}
           onClick={() => onLetterClick(letter)}
           disabled={isLetterDisabled(letter)}
-          className="aspect-square text-sm font-bold hover:scale-105 transition-transform"
+          className="aspect-square text-xs sm:text-sm font-bold hover:scale-105 transition-transform min-h-[40px] sm:min-h-[44px]"
         >
           {letter}
         </Button>
