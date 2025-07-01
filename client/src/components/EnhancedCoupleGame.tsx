@@ -105,6 +105,8 @@ export default function EnhancedCoupleGame() {
     setGamePhase('playing');
     setTimeLeft(60);
     setTimerActive(true);
+    // Switch to guesser role when game starts
+    setIsChallenger(false);
   };
 
   const handleTimeUp = () => {
@@ -217,44 +219,48 @@ export default function EnhancedCoupleGame() {
     }
   };
 
-  // Setup Phase
+  // Auto-setup effect - skip names screen
+  useEffect(() => {
+    if (gamePhase === 'setup') {
+      setPlayer1({ name: 'Jogador 1', score: 0 });
+      setPlayer2({ name: 'Jogador 2', score: 0 });
+      setGamePhase('word-input');
+    }
+  }, [gamePhase]);
+
+  // Setup Phase - Skip names, go directly to word input
   if (gamePhase === 'setup') {
     return (
       <div className="max-w-2xl mx-auto space-y-6 p-4">
         <Card className="bg-black/20 backdrop-blur-sm border-white/10">
-          <CardHeader className="text-center">
-            <CardTitle className="text-white text-2xl flex items-center justify-center gap-2">
-              <Heart className="h-6 w-6 text-pink-400" />
-              Configurar Jogo do Casal
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <CoupleSetupForm onSetup={handleSetup} />
+          <CardContent className="p-6 text-center">
+            <div className="animate-pulse">
+              <Heart className="h-12 w-12 text-pink-400 mx-auto mb-4" />
+              <p className="text-white text-lg">Iniciando Jogo do Casal...</p>
+            </div>
           </CardContent>
         </Card>
       </div>
     );
   }
 
-  // Word Input Phase
+  // Word Input Phase - Simplified
   if (gamePhase === 'word-input') {
     return (
-      <div className="max-w-lg mx-auto space-y-6 p-4">
+      <div className="max-w-lg mx-auto space-y-4 p-4">
         <Card className="bg-black/20 backdrop-blur-sm border-white/10">
-          <CardHeader className="text-center">
+          <CardHeader className="text-center pb-3">
             <CardTitle className="text-white flex items-center justify-center gap-2">
               <Crown className="h-5 w-5 text-yellow-400" />
               Rodada {roundNumber}
             </CardTitle>
-            <div className="text-center mt-2">
-              <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/50">
-                {getCurrentPlayerInfo().name} - Desafiante
-              </Badge>
-            </div>
+            <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/50 mt-2">
+              Desafiante - Escolha uma palavra
+            </Badge>
           </CardHeader>
           <CardContent>
             <SecretWordInputForm 
-              playerName={getCurrentPlayerInfo().name}
+              playerName="Desafiante"
               onWordSet={handleWordSet}
               availableWords={words}
               getRandomWord={getRandomWord}
@@ -416,7 +422,7 @@ export default function EnhancedCoupleGame() {
         <Card className="bg-black/20 backdrop-blur-sm border-white/10">
           <CardHeader className="pb-2">
             <CardTitle className="text-white text-center">
-              {isChallenger ? '⏳ Aguarde sua vez...' : '🎯 Escolha uma letra'}
+              🎯 Escolha uma letra
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -424,23 +430,19 @@ export default function EnhancedCoupleGame() {
               onLetterClick={handleLetterGuess}
               guessedLetters={guessedLetters}
               currentWord={currentWord}
-              disabled={isChallenger || gameState !== 'playing' || !timerActive}
+              disabled={gameState !== 'playing' || !timerActive}
             />
             
-            {isChallenger && (
-              <div className="mt-4 text-center py-3 bg-blue-500/10 rounded-lg">
-                <Sword className="h-8 w-8 text-blue-400 mx-auto mb-2" />
-                <p className="text-white font-bold">Você é o Desafiante!</p>
-                <p className="text-white/70 text-sm">
-                  Aguarde {getOtherPlayerInfo().name} adivinhar...
-                </p>
-              </div>
-            )}
+            <div className="mt-4 text-center py-2 bg-green-500/10 rounded-lg">
+              <p className="text-green-300 text-sm">
+                💡 Clique nas letras para adivinhar a palavra!
+              </p>
+            </div>
           </CardContent>
         </Card>
 
         {/* 4. DICAS */}
-        {!isChallenger && gameState === 'playing' && (
+        {gameState === 'playing' && (
           <Card className="bg-black/20 backdrop-blur-sm border-white/10">
             <CardHeader className="pb-2">
               <CardTitle className="text-white flex items-center justify-center gap-2">
