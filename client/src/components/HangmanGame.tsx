@@ -46,13 +46,13 @@ export default function HangmanGame() {
     switch (gameState) {
       case 'won':
         return {
-          message: "Congratulations! You won!",
+          message: "Parabéns! Você ganhou!",
           icon: <Trophy className="h-6 w-6 text-yellow-400" />,
           color: "text-green-400"
         };
       case 'lost':
         return {
-          message: `Game Over! The word was: ${currentWord}`,
+          message: `Fim de Jogo! A palavra era: ${currentWord}`,
           icon: <Skull className="h-6 w-6 text-red-400" />,
           color: "text-red-400"
         };
@@ -81,7 +81,7 @@ export default function HangmanGame() {
                   {gameMessage.message}
                 </div>
               ) : (
-                "Guess the Word"
+                "Adivinhe a Palavra"
               )}
             </CardTitle>
           </CardHeader>
@@ -98,7 +98,7 @@ export default function HangmanGame() {
                 {getDisplayWord()}
               </div>
               <div className="text-sm text-white/60">
-                Wrong guesses: {wrongGuesses}/6
+                Erros: {wrongGuesses}/6
               </div>
             </div>
 
@@ -118,7 +118,7 @@ export default function HangmanGame() {
                 size="lg"
               >
                 <RefreshCw className="h-4 w-4 mr-2" />
-                New Game
+                Novo Jogo
               </Button>
             </div>
           </CardContent>

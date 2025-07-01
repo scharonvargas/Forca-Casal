@@ -95,14 +95,14 @@ export default function AgeVerification({ onVerify }: AgeVerificationProps) {
                 type="submit"
                 className="flex-1 bg-green-600 hover:bg-green-700 text-white"
               >
-                I'm 18 or Older
+                Tenho 18 ou Mais
               </Button>
             </div>
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-xs text-white/60">
-              By proceeding, you confirm that you are of legal age and consent to viewing adult content.
+              Ao prosseguir, você confirma que tem idade legal e consente em visualizar conteúdo adulto.
             </p>
           </div>
         </CardContent>

@@ -12,7 +12,7 @@ export default function GameStats() {
       <CardHeader>
         <CardTitle className="text-white flex items-center gap-2">
           <Target className="h-5 w-5" />
-          Game Statistics
+          Estatísticas do Jogo
         </CardTitle>
       </CardHeader>
       
@@ -21,7 +21,7 @@ export default function GameStats() {
           <div className="bg-green-500/20 rounded-lg p-3 border border-green-500/30">
             <div className="flex items-center gap-2 mb-1">
               <Trophy className="h-4 w-4 text-green-400" />
-              <span className="text-sm text-green-300">Wins</span>
+              <span className="text-sm text-green-300">Vitórias</span>
             </div>
             <div className="text-2xl font-bold text-white">{stats.wins}</div>
           </div>
@@ -29,7 +29,7 @@ export default function GameStats() {
           <div className="bg-red-500/20 rounded-lg p-3 border border-red-500/30">
             <div className="flex items-center gap-2 mb-1">
               <Skull className="h-4 w-4 text-red-400" />
-              <span className="text-sm text-red-300">Losses</span>
+              <span className="text-sm text-red-300">Derrotas</span>
             </div>
             <div className="text-2xl font-bold text-white">{stats.losses}</div>
           </div>
@@ -38,7 +38,7 @@ export default function GameStats() {
         <div className="bg-blue-500/20 rounded-lg p-3 border border-blue-500/30">
           <div className="flex items-center gap-2 mb-1">
             <Percent className="h-4 w-4 text-blue-400" />
-            <span className="text-sm text-blue-300">Win Rate</span>
+            <span className="text-sm text-blue-300">Taxa de Vitória</span>
           </div>
           <div className="text-2xl font-bold text-white">{winRate}%</div>
         </div>
