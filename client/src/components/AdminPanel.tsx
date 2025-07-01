@@ -67,12 +67,12 @@ export default function AdminPanel() {
             )}
             
             <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">
-              Login
+              Entrar
             </Button>
           </form>
           
           <div className="mt-4 text-center text-xs text-white/60">
-            Default password: admin123
+            Senha padrão: admin123
           </div>
         </CardContent>
       </Card>

@@ -1,11 +1,13 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import HangmanCanvas from "./HangmanCanvas";
 import Keyboard from "./Keyboard";
 import GameStats from "./GameStats";
+import PunishmentModal from "./PunishmentModal";
 import { useHangman } from "../lib/stores/useHangman";
 import { useWords } from "../lib/stores/useWords";
+import { usePunishments } from "../lib/stores/usePunishments";
 import { RefreshCw, Trophy, Skull } from "lucide-react";
 
 export default function HangmanGame() {
