@@ -92,12 +92,17 @@ export default function EnhancedCoupleGame() {
   }, [gameState]);
 
   const handleSetup = (p1Name: string, p2Name: string) => {
-    setPlayer1({ name: p1Name, score: 0 });
-    setPlayer2({ name: p2Name, score: 0 });
+    const newPlayer1 = { name: p1Name, score: 0 };
+    const newPlayer2 = { name: p2Name, score: 0 };
+    setPlayer1(newPlayer1);
+    setPlayer2(newPlayer2);
+    console.log('Players set:', newPlayer1, newPlayer2);
     setGamePhase('word-input');
   };
 
   const handleWordSet = (word: string) => {
+    console.log('Word set:', word);
+    console.log('Current player:', currentPlayer, 'isChallenger:', isChallenger);
     setSecretWord(word);
     newGame(word);
     setGamePhase('playing');
@@ -443,6 +448,11 @@ export default function EnhancedCoupleGame() {
               </CardTitle>
             </CardHeader>
             <CardContent>
+              <div className="mb-4">
+                <p className="text-white/60 text-xs">
+                  Debug: isChallenger={isChallenger.toString()}, gameState={gameState}, timerActive={timerActive.toString()}
+                </p>
+              </div>
               {!isChallenger ? (
                 <Keyboard
                   onLetterClick={handleLetterGuess}
