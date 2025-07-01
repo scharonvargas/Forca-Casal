@@ -5,7 +5,7 @@ import HangmanCanvas from "./HangmanCanvas";
 import Keyboard from "./Keyboard";
 import GameStats from "./GameStats";
 import PunishmentModal from "./PunishmentModal";
-import CoupleGameInterface from "./CoupleGameInterface";
+import EnhancedCoupleGame from "./EnhancedCoupleGame";
 import { useHangman } from "../lib/stores/useHangman";
 import { useWords } from "../lib/stores/useWords";
 import { useCouple } from "../lib/stores/useCouple";
@@ -30,9 +30,9 @@ export default function HangmanGame() {
   const [showPunishment, setShowPunishment] = useState(false);
   const [currentPunishment, setCurrentPunishment] = useState<Punishment | null>(null);
 
-  // If couple mode is selected, use the couple interface
+  // If couple mode is selected, use the enhanced couple interface
   if (gameMode === 'couple') {
-    return <CoupleGameInterface />;
+    return <EnhancedCoupleGame />;
   }
 
   // Start a new game when component mounts
