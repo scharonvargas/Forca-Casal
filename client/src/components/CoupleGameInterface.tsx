@@ -105,12 +105,8 @@ export default function CoupleGameInterface() {
 
   const handleHintUsed = (penalty: number) => {
     setHintsUsed(prev => prev + 1);
-    if (penalty > 0) {
-      // Simulate wrong guesses for the penalty
-      for (let i = 0; i < penalty; i++) {
-        guessLetter('_PENALTY_' + i); // Use a fake letter that will always be wrong
-      }
-    }
+    // Note: For now, we'll just track hints used. 
+    // Penalty system can be implemented later to avoid breaking the game flow
   };
 
   const handleLetterGuess = (letter: string) => {
