@@ -91,6 +91,7 @@ Este é um aplicativo web completo implementando um jogo da forca temático adul
 
 ## Changelog
 - July 01, 2025. Initial setup
+- July 01, 2025. Fixed deployment configuration mismatch - reorganized build output to support both static and full-stack deployment strategies
 
 ## User Preferences
 
