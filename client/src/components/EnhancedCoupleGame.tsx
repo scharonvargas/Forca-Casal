@@ -51,9 +51,9 @@ export default function EnhancedCoupleGame() {
   const [hintsUsed, setHintsUsed] = useState(0);
   const [revealedHints, setRevealedHints] = useState<string[]>([]);
   
-  // Punishment modal
+  // Punishment modal with 3 options
   const [showPunishment, setShowPunishment] = useState(false);
-  const [currentPunishment, setCurrentPunishment] = useState<any>(null);
+  const [punishmentOptions, setPunishmentOptions] = useState<any[]>([]);
 
   const {
     currentWord,
@@ -141,13 +141,26 @@ export default function EnhancedCoupleGame() {
     
     // Only show punishment when match ends (someone reaches 2 wins)
     if (newPlayer1Score === 2 || newPlayer2Score === 2) {
-      const loser = newPlayer1Score === 2 ? 2 : 1;
-      if (loser === 1) { // Adivinhador perdeu a partida
+      // Generate 3 random punishment options
+      const options: any[] = [];
+      for (let i = 0; i < 3; i++) {
+        const punishment = getRandomPunishment();
+        if (punishment && !options.find(p => p.id === punishment.id)) {
+          options.push(punishment);
+        }
+      }
+      
+      // Ensure we have at least 3 options (fill with random if needed)
+      while (options.length < 3) {
         const punishment = getRandomPunishment();
         if (punishment) {
-          setCurrentPunishment(punishment);
-          setShowPunishment(true);
+          options.push(punishment);
         }
+      }
+      
+      if (options.length > 0) {
+        setPunishmentOptions(options);
+        setShowPunishment(true);
       }
     }
     
@@ -639,12 +652,112 @@ export default function EnhancedCoupleGame() {
         </Card>
       )}
 
-      {/* Punishment Modal */}
-      <PunishmentModal
+      {/* Punishment Modal with 3 Options */}
+      <PunishmentChoiceModal
         isOpen={showPunishment}
         onClose={() => setShowPunishment(false)}
-        punishment={currentPunishment}
+        punishmentOptions={punishmentOptions}
+        loserName={player1.score === 2 ? player2.name : player1.name}
       />
+    </div>
+  );
+}
+
+// Punishment Choice Modal Component
+function PunishmentChoiceModal({ 
+  isOpen, 
+  onClose, 
+  punishmentOptions, 
+  loserName 
+}: { 
+  isOpen: boolean, 
+  onClose: () => void, 
+  punishmentOptions: any[], 
+  loserName: string 
+}) {
+  const [selectedPunishment, setSelectedPunishment] = useState<any>(null);
+
+  if (!isOpen) return null;
+
+  const handleConfirm = () => {
+    onClose();
+    setSelectedPunishment(null);
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-black/90 backdrop-blur-sm rounded-lg border border-white/20 max-w-md w-full max-h-[80vh] overflow-y-auto">
+        <div className="p-6">
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-bold text-pink-400 mb-2">
+              🔥 Hora do Castigo! 
+            </h2>
+            <p className="text-white text-lg">
+              {loserName} perdeu a partida!
+            </p>
+            <p className="text-white/70 text-sm">
+              Escolha 1 das 3 opções de castigo:
+            </p>
+          </div>
+
+          <div className="space-y-3 mb-6">
+            {punishmentOptions.map((punishment, index) => (
+              <button
+                key={punishment.id}
+                onClick={() => setSelectedPunishment(punishment)}
+                className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
+                  selectedPunishment?.id === punishment.id
+                    ? 'border-pink-500 bg-pink-500/20'
+                    : 'border-white/20 bg-white/5 hover:border-pink-500/50'
+                }`}
+              >
+                <div className="flex items-start gap-3">
+                  <div className="text-2xl">{index + 1}</div>
+                  <div className="flex-1">
+                    <h3 className="text-white font-bold text-lg mb-2">
+                      {punishment.title}
+                    </h3>
+                    <p className="text-white/80 text-sm mb-2">
+                      {punishment.description}
+                    </p>
+                    <div className="flex gap-2">
+                      <span className={`px-2 py-1 rounded text-xs ${
+                        punishment.category === 'leve' ? 'bg-green-500/20 text-green-300' :
+                        punishment.category === 'moderado' ? 'bg-yellow-500/20 text-yellow-300' :
+                        'bg-red-500/20 text-red-300'
+                      }`}>
+                        {punishment.category}
+                      </span>
+                      <span className="px-2 py-1 rounded text-xs bg-purple-500/20 text-purple-300">
+                        {punishment.type}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+
+          <div className="space-y-3">
+            {selectedPunishment && (
+              <div className="p-4 bg-pink-500/20 rounded-lg border border-pink-500/50">
+                <h4 className="text-pink-300 font-bold mb-2">Castigo Selecionado:</h4>
+                <p className="text-white text-lg">{selectedPunishment.title}</p>
+              </div>
+            )}
+            
+            <div className="flex gap-3">
+              <Button
+                onClick={handleConfirm}
+                disabled={!selectedPunishment}
+                className="flex-1 bg-gradient-to-r from-pink-600 to-red-600 hover:from-pink-700 hover:to-red-700"
+              >
+                {selectedPunishment ? 'Aceitar Castigo 😈' : 'Selecione um castigo'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
