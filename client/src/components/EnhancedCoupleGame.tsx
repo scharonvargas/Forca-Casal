@@ -367,68 +367,70 @@ export default function EnhancedCoupleGame() {
 
 
 
-      {/* Mobile-First Game Area */}
-      <div className="space-y-4">
-        {/* Main Game Section - Forca and Word Display */}
+      {/* FORCA NO TOPO - Layout Mobile */}
+      <div className="space-y-3">
+        {/* 1. FORCA SEMPRE NO TOPO */}
         <Card className="bg-black/20 backdrop-blur-sm border-white/10">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-white text-center">🎯 Forca</CardTitle>
+          </CardHeader>
           <CardContent className="p-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-              {/* Hangman Canvas */}
-              <div className="flex justify-center">
-                <div className="w-48 h-48 md:w-56 md:h-56">
-                  <HangmanCanvas wrongGuesses={wrongGuesses} />
-                </div>
-              </div>
-              
-              {/* Game Info */}
-              <div className="space-y-4 text-center md:text-left">
-                <div>
-                  <div className="text-white/70 text-sm mb-2">Palavra Secreta:</div>
-                  <div className="text-xl md:text-2xl font-mono text-white tracking-widest bg-white/10 rounded-lg p-3">
-                    {getDisplayWord()}
-                  </div>
-                </div>
-                
-                <div className="flex items-center justify-center md:justify-start gap-4 text-sm">
-                  <div>
-                    <Heart className="h-4 w-4 text-red-400 inline mr-1" />
-                    <span className="text-white">Erros: {wrongGuesses}/6</span>
-                  </div>
-                  <div>
-                    <span className={`px-2 py-1 rounded ${
-                      gameState === 'playing' ? 'bg-green-500/20 text-green-300' :
-                      gameState === 'won' ? 'bg-blue-500/20 text-blue-300' :
-                      'bg-red-500/20 text-red-300'
-                    }`}>
-                      {gameState === 'playing' ? 'Jogando' :
-                       gameState === 'won' ? 'Ganhou!' : 'Perdeu!'}
-                    </span>
-                  </div>
-                </div>
+            <div className="flex justify-center">
+              <div className="w-64 h-64">
+                <HangmanCanvas wrongGuesses={wrongGuesses} />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Keyboard Section */}
+        {/* 2. PALAVRA SECRETA */}
         <Card className="bg-black/20 backdrop-blur-sm border-white/10">
-          <CardHeader className="pb-3">
+          <CardContent className="p-4 text-center">
+            <div className="mb-3">
+              <div className="text-white/70 text-sm mb-2">Palavra Secreta:</div>
+              <div className="text-2xl font-mono text-white tracking-widest bg-white/10 rounded-lg p-4">
+                {getDisplayWord()}
+              </div>
+            </div>
+            
+            <div className="flex items-center justify-center gap-4 text-sm">
+              <div>
+                <Heart className="h-4 w-4 text-red-400 inline mr-1" />
+                <span className="text-white">Erros: {wrongGuesses}/6</span>
+              </div>
+              <div>
+                <span className={`px-3 py-1 rounded ${
+                  gameState === 'playing' ? 'bg-green-500/20 text-green-300' :
+                  gameState === 'won' ? 'bg-blue-500/20 text-blue-300' :
+                  'bg-red-500/20 text-red-300'
+                }`}>
+                  {gameState === 'playing' ? 'Jogando' :
+                   gameState === 'won' ? 'Ganhou!' : 'Perdeu!'}
+                </span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* 3. TECLADO - SEMPRE VISÍVEL */}
+        <Card className="bg-black/20 backdrop-blur-sm border-white/10">
+          <CardHeader className="pb-2">
             <CardTitle className="text-white text-center">
-              {isChallenger ? 'Aguarde sua vez...' : 'Escolha uma letra'}
+              {isChallenger ? '⏳ Aguarde sua vez...' : '🎯 Escolha uma letra'}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {!isChallenger ? (
-              <Keyboard
-                onLetterClick={handleLetterGuess}
-                guessedLetters={guessedLetters}
-                currentWord={currentWord}
-                disabled={gameState !== 'playing' || !timerActive}
-              />
-            ) : (
-              <div className="text-center py-6">
-                <Sword className="h-10 w-10 text-blue-400 mx-auto mb-3" />
-                <p className="text-white text-lg mb-2">Você é o Desafiante!</p>
+            <Keyboard
+              onLetterClick={handleLetterGuess}
+              guessedLetters={guessedLetters}
+              currentWord={currentWord}
+              disabled={isChallenger || gameState !== 'playing' || !timerActive}
+            />
+            
+            {isChallenger && (
+              <div className="mt-4 text-center py-3 bg-blue-500/10 rounded-lg">
+                <Sword className="h-8 w-8 text-blue-400 mx-auto mb-2" />
+                <p className="text-white font-bold">Você é o Desafiante!</p>
                 <p className="text-white/70 text-sm">
                   Aguarde {getOtherPlayerInfo().name} adivinhar...
                 </p>
@@ -437,18 +439,18 @@ export default function EnhancedCoupleGame() {
           </CardContent>
         </Card>
 
-        {/* Hints System */}
+        {/* 4. DICAS */}
         {!isChallenger && gameState === 'playing' && (
           <Card className="bg-black/20 backdrop-blur-sm border-white/10">
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-2">
               <CardTitle className="text-white flex items-center justify-center gap-2">
                 <Lightbulb className="h-5 w-5 text-yellow-400" />
-                Dicas Disponíveis ({hintsUsed}/3)
+                💡 Dicas ({hintsUsed}/3)
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               {revealedHints.map((hint, index) => (
-                <div key={index} className="p-3 bg-green-500/20 border border-green-500/50 rounded-lg text-green-300 text-sm">
+                <div key={index} className="p-3 bg-green-500/20 border border-green-500/50 rounded-lg text-green-300">
                   {hint}
                 </div>
               ))}
@@ -456,11 +458,11 @@ export default function EnhancedCoupleGame() {
               {hintsUsed < 3 && (
                 <Button
                   onClick={handleUseHint}
-                  className="w-full bg-yellow-600 hover:bg-yellow-700 py-3"
+                  className="w-full bg-yellow-600 hover:bg-yellow-700 py-3 text-lg"
                   disabled={!timerActive}
                 >
-                  <Clock className="h-4 w-4 mr-2" />
-                  Usar Dica (-10 segundos)
+                  <Clock className="h-5 w-5 mr-2" />
+                  💡 Usar Dica (-10 segundos)
                 </Button>
               )}
             </CardContent>
