@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { useHangman } from '@/lib/stores/useHangman';
 import { usePunishments } from '@/lib/stores/usePunishments';
+import { useWords } from '@/lib/stores/useWords';
 import HangmanCanvas from './HangmanCanvas';
 import Keyboard from './Keyboard';
 import PunishmentModal from './PunishmentModal';
@@ -64,6 +65,7 @@ export default function EnhancedCoupleGame() {
   } = useHangman();
 
   const { getRandomPunishment } = usePunishments();
+  const { words, getRandomWord } = useWords();
 
   const getCurrentPlayerInfo = () => currentPlayer === 1 ? player1 : player2;
   const getOtherPlayerInfo = () => currentPlayer === 1 ? player2 : player1;
@@ -251,7 +253,9 @@ export default function EnhancedCoupleGame() {
           <CardContent>
             <SecretWordInputForm 
               playerName={getCurrentPlayerInfo().name}
-              onWordSet={handleWordSet} 
+              onWordSet={handleWordSet}
+              availableWords={words}
+              getRandomWord={getRandomWord}
             />
           </CardContent>
         </Card>
@@ -554,55 +558,152 @@ function CoupleSetupForm({ onSetup }: { onSetup: (p1: string, p2: string) => voi
 }
 
 // Secret Word Input Form Component
-function SecretWordInputForm({ playerName, onWordSet }: { playerName: string, onWordSet: (word: string) => void }) {
-  const [word, setWord] = useState('');
-  const [showWord, setShowWord] = useState(false);
+function SecretWordInputForm({ 
+  playerName, 
+  onWordSet, 
+  availableWords, 
+  getRandomWord 
+}: { 
+  playerName: string, 
+  onWordSet: (word: string) => void,
+  availableWords: string[],
+  getRandomWord: () => string | null
+}) {
+  const [inputMode, setInputMode] = useState<'custom' | 'predefined'>('custom');
+  const [customWord, setCustomWord] = useState('');
+  const [selectedWord, setSelectedWord] = useState('');
+  const [showCustomWord, setShowCustomWord] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleCustomSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (word.trim() && word.trim().length >= 3) {
-      onWordSet(word.trim().toUpperCase());
+    if (customWord.trim() && customWord.trim().length >= 3) {
+      onWordSet(customWord.trim().toUpperCase());
+    }
+  };
+
+  const handlePredefinedSubmit = () => {
+    if (selectedWord) {
+      onWordSet(selectedWord);
+    }
+  };
+
+  const handleRandomWord = () => {
+    const randomWord = getRandomWord();
+    if (randomWord) {
+      onWordSet(randomWord);
     }
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="text-center mb-4">
         <h3 className="text-white font-bold text-lg">{playerName}</h3>
         <p className="text-white/70 text-sm">Escolha uma palavra secreta</p>
       </div>
-      
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="relative">
-          <Input
-            type={showWord ? "text" : "password"}
-            value={word}
-            onChange={(e) => setWord(e.target.value)}
-            placeholder="Digite a palavra secreta..."
-            className="bg-white/10 border-white/20 text-white placeholder-white/50"
-            minLength={3}
-            maxLength={20}
-            required
-          />
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowWord(!showWord)}
-            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-white/60 hover:text-white"
-          >
-            {showWord ? '👁️' : '👁️‍🗨️'}
-          </Button>
-        </div>
-        
+
+      {/* Mode Selection */}
+      <div className="flex rounded-lg bg-white/10 p-1">
         <Button
-          type="submit"
-          className="w-full bg-blue-600 hover:bg-blue-700"
-          disabled={!word.trim() || word.trim().length < 3}
+          type="button"
+          variant={inputMode === 'custom' ? 'default' : 'ghost'}
+          className={`flex-1 ${inputMode === 'custom' ? 'bg-blue-600' : 'text-white/70'}`}
+          onClick={() => setInputMode('custom')}
         >
-          Definir Palavra
+          Palavra Personalizada
         </Button>
-      </form>
+        <Button
+          type="button"
+          variant={inputMode === 'predefined' ? 'default' : 'ghost'}
+          className={`flex-1 ${inputMode === 'predefined' ? 'bg-purple-600' : 'text-white/70'}`}
+          onClick={() => setInputMode('predefined')}
+        >
+          Palavras Pré-cadastradas
+        </Button>
+      </div>
+
+      {/* Custom Word Input */}
+      {inputMode === 'custom' && (
+        <form onSubmit={handleCustomSubmit} className="space-y-4">
+          <div className="relative">
+            <Input
+              type={showCustomWord ? "text" : "password"}
+              value={customWord}
+              onChange={(e) => setCustomWord(e.target.value)}
+              placeholder="Digite a palavra secreta..."
+              className="bg-white/10 border-white/20 text-white placeholder-white/50 pr-12"
+              minLength={3}
+              maxLength={20}
+              required
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowCustomWord(!showCustomWord)}
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 text-white/60 hover:text-white p-1"
+            >
+              {showCustomWord ? '👁️' : '🔒'}
+            </Button>
+          </div>
+          
+          <Button
+            type="submit"
+            className="w-full bg-blue-600 hover:bg-blue-700"
+            disabled={!customWord.trim() || customWord.trim().length < 3}
+          >
+            <Target className="h-4 w-4 mr-2" />
+            Usar Esta Palavra
+          </Button>
+        </form>
+      )}
+
+      {/* Predefined Words */}
+      {inputMode === 'predefined' && (
+        <div className="space-y-4">
+          <div className="space-y-3">
+            <Button
+              onClick={handleRandomWord}
+              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+            >
+              <RotateCcw className="h-4 w-4 mr-2" />
+              Palavra Aleatória
+            </Button>
+            
+            <div className="text-center text-white/60 text-sm">
+              ou escolha uma palavra específica:
+            </div>
+
+            <div className="max-h-48 overflow-y-auto bg-white/5 rounded-lg border border-white/10">
+              <div className="grid grid-cols-1 gap-1 p-2">
+                {availableWords.slice(0, 20).map((word, index) => (
+                  <Button
+                    key={index}
+                    variant="ghost"
+                    onClick={() => setSelectedWord(word)}
+                    className={`justify-start text-left h-auto py-2 px-3 ${
+                      selectedWord === word 
+                        ? 'bg-purple-500/30 text-purple-200 border border-purple-500/50' 
+                        : 'text-white/80 hover:bg-white/10'
+                    }`}
+                  >
+                    {word}
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            {selectedWord && (
+              <Button
+                onClick={handlePredefinedSubmit}
+                className="w-full bg-purple-600 hover:bg-purple-700"
+              >
+                <Target className="h-4 w-4 mr-2" />
+                Usar: {selectedWord}
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
