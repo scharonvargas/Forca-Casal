@@ -4,6 +4,7 @@ import AgeVerification from "./components/AgeVerification";
 import HangmanGame from "./components/HangmanGame";
 import AdminPanel from "./components/AdminPanel";
 import CoupleSetup from "./components/CoupleSetup";
+import GameModeSelector from "./components/GameModeSelector";
 import { Button } from "./components/ui/button";
 import { Card } from "./components/ui/card";
 import { useAdmin } from "./lib/stores/useAdmin";
@@ -51,11 +52,23 @@ function App() {
               </h1>
               
               <div className="flex gap-2 w-full sm:w-auto">
+                {currentView !== 'modeSelect' && (
+                  <Button
+                    variant="outline"
+                    onClick={() => setCurrentView('modeSelect')}
+                    className="text-white border-white/20 flex-1 sm:flex-none"
+                    size="sm"
+                  >
+                    <User className="h-4 w-4 mr-1 sm:mr-2" />
+                    Modo
+                  </Button>
+                )}
                 <Button
                   variant={currentView === 'game' ? 'default' : 'outline'}
                   onClick={() => setCurrentView('game')}
                   className="text-white border-white/20 flex-1 sm:flex-none"
                   size="sm"
+                  disabled={currentView === 'modeSelect'}
                 >
                   Jogar
                 </Button>
@@ -70,10 +83,24 @@ function App() {
                 </Button>
               </div>
             </div>
+            
+            {/* Game Mode Indicator */}
+            {currentView === 'game' && gameMode !== 'single' && (
+              <div className="mt-3 pt-3 border-t border-white/10">
+                <div className="flex justify-center gap-4 text-sm">
+                  <span className="text-white/70">Modo:</span>
+                  <span className="text-pink-300 font-medium">
+                    {gameMode === 'couple' ? `${player1.name} vs ${player2.name}` : 'Solo'}
+                  </span>
+                </div>
+              </div>
+            )}
           </Card>
 
           {/* Main Content */}
-          {currentView === 'game' ? (
+          {currentView === 'modeSelect' ? (
+            <GameModeSelector onModeSelected={() => setCurrentView('game')} />
+          ) : currentView === 'game' ? (
             <HangmanGame />
           ) : (
             <AdminPanel />
