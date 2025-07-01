@@ -13,6 +13,8 @@ import { usePunishments, Punishment } from "../lib/stores/usePunishments";
 import { RefreshCw, Trophy, Skull } from "lucide-react";
 
 export default function HangmanGame() {
+  const { gameMode } = useCouple();
+  
   const {
     currentWord,
     guessedLetters,
@@ -27,6 +29,11 @@ export default function HangmanGame() {
   const { getRandomPunishment } = usePunishments();
   const [showPunishment, setShowPunishment] = useState(false);
   const [currentPunishment, setCurrentPunishment] = useState<Punishment | null>(null);
+
+  // If couple mode is selected, use the couple interface
+  if (gameMode === 'couple') {
+    return <CoupleGameInterface />;
+  }
 
   // Start a new game when component mounts
   useEffect(() => {
