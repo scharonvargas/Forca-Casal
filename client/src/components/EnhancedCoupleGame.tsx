@@ -307,10 +307,11 @@ export default function EnhancedCoupleGame() {
               onClick={handleNewGame}
               variant="outline"
               size="sm"
-              className="text-white border-white/20 hover:bg-white/10 text-xs"
+              className="text-white border-white/20 hover:bg-white/10 text-xs flex items-center gap-1 px-2 py-1"
             >
-              <RefreshCw className="h-3 w-3 mr-1" />
-              Nova Partida
+              <RefreshCw className="h-3 w-3" />
+              <span className="hidden sm:inline">Nova Partida</span>
+              <span className="sm:hidden">Novo</span>
             </Button>
           </div>
         </CardContent>
@@ -460,11 +461,11 @@ export default function EnhancedCoupleGame() {
               {hintsUsed < 3 && (
                 <Button
                   onClick={handleUseHint}
-                  className="w-full bg-yellow-600 hover:bg-yellow-700 py-3 text-lg"
+                  className="w-full bg-yellow-600 hover:bg-yellow-700 py-3 text-sm flex items-center justify-center gap-2"
                   disabled={!timerActive}
                 >
-                  <Clock className="h-5 w-5 mr-2" />
-                  💡 Usar Dica (-10 segundos)
+                  <Clock className="h-4 w-4" />
+                  <span>Usar Dica (-10s)</span>
                 </Button>
               )}
             </CardContent>
@@ -610,22 +611,24 @@ function SecretWordInputForm({
       </div>
 
       {/* Mode Selection */}
-      <div className="flex rounded-lg bg-white/10 p-1">
+      <div className="flex rounded-lg bg-white/10 p-1 gap-1">
         <Button
           type="button"
           variant={inputMode === 'custom' ? 'default' : 'ghost'}
-          className={`flex-1 ${inputMode === 'custom' ? 'bg-blue-600' : 'text-white/70'}`}
+          className={`flex-1 text-xs sm:text-sm px-2 py-2 ${inputMode === 'custom' ? 'bg-blue-600' : 'text-white/70'}`}
           onClick={() => setInputMode('custom')}
         >
-          Palavra Personalizada
+          <span className="hidden sm:inline">Palavra Personalizada</span>
+          <span className="sm:hidden">Personalizada</span>
         </Button>
         <Button
           type="button"
           variant={inputMode === 'predefined' ? 'default' : 'ghost'}
-          className={`flex-1 ${inputMode === 'predefined' ? 'bg-purple-600' : 'text-white/70'}`}
+          className={`flex-1 text-xs sm:text-sm px-2 py-2 ${inputMode === 'predefined' ? 'bg-purple-600' : 'text-white/70'}`}
           onClick={() => setInputMode('predefined')}
         >
-          Palavras Pré-cadastradas
+          <span className="hidden sm:inline">Palavras Pré-cadastradas</span>
+          <span className="sm:hidden">Pré-cadastradas</span>
         </Button>
       </div>
 
@@ -656,11 +659,11 @@ function SecretWordInputForm({
           
           <Button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700"
+            className="w-full bg-blue-600 hover:bg-blue-700 flex items-center justify-center gap-2 py-3"
             disabled={!customWord.trim() || customWord.trim().length < 3}
           >
-            <Target className="h-4 w-4 mr-2" />
-            Usar Esta Palavra
+            <Target className="h-4 w-4" />
+            <span>Usar Esta Palavra</span>
           </Button>
         </form>
       )}
@@ -671,10 +674,10 @@ function SecretWordInputForm({
           <div className="space-y-3">
             <Button
               onClick={handleRandomWord}
-              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 flex items-center justify-center gap-2 py-3"
             >
-              <RotateCcw className="h-4 w-4 mr-2" />
-              Palavra Aleatória
+              <RotateCcw className="h-4 w-4" />
+              <span>Palavra Aleatória</span>
             </Button>
             
             <div className="text-center text-white/60 text-sm">

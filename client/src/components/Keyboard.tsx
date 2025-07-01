@@ -29,14 +29,14 @@ export default function Keyboard({ onLetterClick, guessedLetters, currentWord, d
   return (
     <div className="space-y-2">
       {/* Mobile-optimized keyboard layout */}
-      <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-2 max-w-4xl mx-auto">
+      <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-1 sm:gap-2 max-w-4xl mx-auto">
         {letters.map((letter) => (
           <Button
             key={letter}
             variant={getButtonVariant(letter)}
             onClick={() => onLetterClick(letter)}
             disabled={isLetterDisabled(letter)}
-            className="aspect-square text-sm sm:text-base font-bold hover:scale-105 transition-transform min-h-[48px] sm:min-h-[52px] touch-manipulation"
+            className="aspect-square text-xs sm:text-sm md:text-base font-bold hover:scale-105 transition-transform min-h-[44px] sm:min-h-[48px] md:min-h-[52px] touch-manipulation flex items-center justify-center p-0"
             style={{ touchAction: 'manipulation' }}
           >
             {letter}
