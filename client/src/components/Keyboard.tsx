@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Button } from "./ui/button";
 
 interface KeyboardProps {
@@ -25,6 +26,29 @@ export default function Keyboard({ onLetterClick, guessedLetters, currentWord, d
   const isLetterDisabled = (letter: string) => {
     return disabled || guessedLetters.has(letter);
   };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        target.isContentEditable
+      ) {
+        return;
+      }
+
+      const letter = e.key.toUpperCase();
+      if (letters.includes(letter) && !isLetterDisabled(letter)) {
+        onLetterClick(letter);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [guessedLetters, disabled, onLetterClick]);
 
   return (
     <div className="space-y-2">
