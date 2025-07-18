@@ -14,6 +14,10 @@ npx esbuild server/index.ts --platform=node --packages=external --bundle --forma
 echo "Reorganizing build output for deployment..."
 
 # Copy public files to dist root for static deployment
+if [ ! -d dist/public ]; then
+  echo "Error: dist/public directory is missing. Did the build step succeed?" >&2
+  exit 1
+fi
 cp -r dist/public/* dist/
 
 # Also keep them in dist/public for Express server compatibility
