@@ -33,8 +33,7 @@ export default function AgeVerification({ onVerify }: AgeVerificationProps) {
   };
 
   const handleDecline = () => {
-    // Redirect to a safe page or show appropriate message
-    window.location.href = "https://www.google.com";
+    window.location.href = "/not-allowed";
   };
 
   return (
