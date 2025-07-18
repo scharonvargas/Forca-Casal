@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { useHangman } from "../lib/stores/useHangman";
-import { Trophy, Skull, Target, Percent } from "lucide-react";
+import { Trophy, Skull, Target, Percent, Flame } from "lucide-react";
 
 export default function GameStats() {
   const { stats } = useHangman();
@@ -41,6 +41,14 @@ export default function GameStats() {
             <span className="text-sm text-blue-300">Taxa de Vitória</span>
           </div>
           <div className="text-2xl font-bold text-white">{winRate}%</div>
+        </div>
+
+        <div className="bg-purple-500/20 rounded-lg p-3 border border-purple-500/30">
+          <div className="flex items-center gap-2 mb-1">
+            <Flame className="h-4 w-4 text-purple-400" />
+            <span className="text-sm text-purple-300">Melhor Sequência</span>
+          </div>
+          <div className="text-2xl font-bold text-white">{stats.bestStreak}</div>
         </div>
 
         <div className="text-center pt-2">

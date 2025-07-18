@@ -7,23 +7,27 @@ interface GameStats {
   wins: number;
   losses: number;
   totalGames: number;
+  bestStreak: number;
+  currentStreak: number;
 }
 
 interface HangmanState {
   currentWord: string;
   guessedLetters: Set<string>;
   wrongGuesses: number;
+  maxWrongGuesses: number;
   gameState: GameState;
   stats: GameStats;
   timeLeft: number;
   timeEnabled: boolean;
   
   // Actions
-  newGame: (word: string) => void;
+  newGame: (word: string, maxGuesses?: number) => void;
   guessLetter: (letter: string) => void;
   getDisplayWord: () => string;
   setTimeLeft: (time: number) => void;
   setTimeEnabled: (enabled: boolean) => void;
+  setMaxWrongGuesses: (max: number) => void;
 }
 
 export const useHangman = create<HangmanState>()(
@@ -31,21 +35,25 @@ export const useHangman = create<HangmanState>()(
     (set, get) => ({
       currentWord: "",
       guessedLetters: new Set(),
-      wrongGuesses: 0,
-      gameState: 'playing',
-      stats: {
-        wins: 0,
-        losses: 0,
-        totalGames: 0
-      },
+    wrongGuesses: 0,
+    maxWrongGuesses: 6,
+    gameState: 'playing',
+    stats: {
+      wins: 0,
+      losses: 0,
+      totalGames: 0,
+      bestStreak: 0,
+      currentStreak: 0
+    },
       timeLeft: 0,
       timeEnabled: false,
 
-      newGame: (word: string) => {
+      newGame: (word: string, maxGuesses = get().maxWrongGuesses) => {
         set({
           currentWord: word.toUpperCase(),
           guessedLetters: new Set(),
           wrongGuesses: 0,
+          maxWrongGuesses: maxGuesses,
           gameState: 'playing'
         });
       },
@@ -73,24 +81,28 @@ export const useHangman = create<HangmanState>()(
         );
 
         // Check lose condition
-        const isLost = newWrongGuesses >= 6;
+        const isLost = newWrongGuesses >= state.maxWrongGuesses;
 
         let newGameState: GameState = 'playing';
         let newStats = state.stats;
 
         if (isWon) {
+          const currentStreak = state.stats.currentStreak + 1;
           newGameState = 'won';
           newStats = {
             ...state.stats,
             wins: state.stats.wins + 1,
-            totalGames: state.stats.totalGames + 1
+            totalGames: state.stats.totalGames + 1,
+            currentStreak,
+            bestStreak: Math.max(state.stats.bestStreak, currentStreak)
           };
         } else if (isLost) {
           newGameState = 'lost';
           newStats = {
             ...state.stats,
             losses: state.stats.losses + 1,
-            totalGames: state.stats.totalGames + 1
+            totalGames: state.stats.totalGames + 1,
+            currentStreak: 0
           };
         }
 
@@ -116,6 +128,10 @@ export const useHangman = create<HangmanState>()(
 
       setTimeEnabled: (enabled: boolean) => {
         set({ timeEnabled: enabled });
+      },
+
+      setMaxWrongGuesses: (max: number) => {
+        set({ maxWrongGuesses: max });
       }
     }),
     {

@@ -37,7 +37,10 @@ export default function WordHintSystem({
     // Hint 2: First letter
     hints.push(`🎯 Começa com a letra "${cleanWord[0]}"`);
 
-    // Hint 3: Category hint based on the word
+    // Hint 3: Last letter
+    hints.push(`🏁 Termina com "${cleanWord[cleanWord.length - 1]}"`);
+
+    // Hint 4: Category hint based on the word
     const romanticWords = ['ROMANCE', 'PAIXAO', 'AMOR', 'CARINHO', 'BEIJO', 'ABRACO'];
     const sensualWords = ['DESEJO', 'SEDUCAO', 'SENSUAL', 'TESAO', 'EXCITACAO', 'PRAZER'];
     const actionWords = ['MASSAGEM', 'TOQUE', 'CARICIA', 'MORDIDA', 'LAMBIDA', 'SUSSURRO'];
@@ -62,6 +65,12 @@ export default function WordHintSystem({
       }
     }
 
+    // Hint 5: Vogais únicas
+    const uniqueVowels = Array.from(new Set(cleanWord.replace(/[^AEIOU]/g, '').split('')));
+    if (uniqueVowels.length > 0) {
+      hints.push(`🎵 Contém as vogais: ${uniqueVowels.join(', ')}`);
+    }
+
     return hints;
   };
 
@@ -71,7 +80,7 @@ export default function WordHintSystem({
 
   const handleUseHint = (hintIndex: number) => {
     if (canUseHint) {
-      const penalty = hintIndex === 0 ? 0 : hintIndex === 1 ? 1 : 2; // Different penalties for different hints
+      const penalty = hintIndex === 0 ? 0 : hintIndex === 1 ? 1 : hintIndex === 2 ? 2 : 3;
       onHintUsed(penalty);
     }
   };
@@ -121,7 +130,7 @@ export default function WordHintSystem({
           {hints.map((hint, index) => {
             const isUsed = index < hintsUsed;
             const isNext = index === hintsUsed;
-            const penalty = index === 0 ? 0 : index === 1 ? 1 : 2;
+            const penalty = index === 0 ? 0 : index === 1 ? 1 : index === 2 ? 2 : 3;
             
             return (
               <div

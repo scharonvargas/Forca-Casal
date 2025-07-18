@@ -9,13 +9,13 @@ import { useWords } from '@/lib/stores/useWords';
 import HangmanCanvas from './HangmanCanvas';
 import Keyboard from './Keyboard';
 import PunishmentModal from './PunishmentModal';
-import { 
-  Crown, 
-  Trophy, 
-  Heart, 
-  ArrowRight, 
-  User, 
-  Target, 
+import {
+  Crown,
+  Trophy,
+  Heart,
+  ArrowRight,
+  User,
+  Target,
   Sword,
   Timer,
   RotateCcw,
@@ -24,6 +24,7 @@ import {
   Play,
   RefreshCw
 } from 'lucide-react';
+import { playSound } from '@/lib/utils/playSound';
 
 interface Player {
   name: string;
@@ -235,33 +236,6 @@ export default function EnhancedCoupleGame() {
     }
   };
 
-  const playSound = (type: 'correct' | 'wrong' | 'victory' | 'defeat') => {
-    try {
-      const audio = new Audio();
-      switch (type) {
-        case 'correct':
-          // Som de acerto - frequência alta positiva
-          audio.src = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmIWAC2WzfHCdSoFl2++8eecSA'; // Simplified beep sound
-          break;
-        case 'wrong':
-          // Som de erro - frequência baixa
-          audio.src = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmIWAC2WzfHCdSoFl2++8eecSA';
-          break;
-        case 'victory':
-          // Som de vitória
-          audio.src = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmIWAC2WzfHCdSoFl2++8eecSA';
-          break;
-        case 'defeat':
-          // Som de derrota
-          audio.src = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmIWAC2WzfHCdSoFl2++8eecSA';
-          break;
-      }
-      audio.volume = 0.3;
-      audio.play().catch(() => {}); // Ignore errors if audio fails
-    } catch (error) {
-      // Ignore audio errors
-    }
-  };
 
   const handleLetterGuess = (letter: string) => {
     if (gameState === 'playing' && timerActive) {
