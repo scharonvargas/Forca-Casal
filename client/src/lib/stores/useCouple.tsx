@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 export type GameMode = 'single' | 'couple';
 export type PlayerRole = 'challenger' | 'guesser';
@@ -39,7 +40,9 @@ interface CoupleState {
   isCurrentPlayerGuesser: () => boolean;
 }
 
-export const useCouple = create<CoupleState>()((set, get) => ({
+export const useCouple = create<CoupleState>()(
+  persist(
+    (set, get) => ({
       // Initial state
       gameMode: 'single',
       player1: { name: '', score: 0 },
@@ -106,4 +109,16 @@ export const useCouple = create<CoupleState>()((set, get) => ({
       isCurrentPlayerChallenger: () => get().currentRole === 'challenger',
       
       isCurrentPlayerGuesser: () => get().currentRole === 'guesser'
-    }));
+    }),
+    {
+      name: 'couple-game',
+      partialize: (state) => ({
+        player1: state.player1,
+        player2: state.player2,
+        maxWrongGuesses: state.maxWrongGuesses,
+        gameMode: state.gameMode,
+        roundNumber: state.roundNumber
+      })
+    }
+  )
+);
