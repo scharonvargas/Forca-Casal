@@ -9,7 +9,8 @@ interface AdminState {
   logout: () => void;
 }
 
-const ADMIN_PASSWORD = "admin123"; // In a real app, this would be handled securely
+const getAdminPassword = () =>
+  import.meta.env.VITE_ADMIN_PASSWORD ?? "";
 
 export const useAdmin = create<AdminState>()(
   persist(
@@ -17,7 +18,7 @@ export const useAdmin = create<AdminState>()(
       isAuthenticated: false,
 
       login: (password: string) => {
-        if (password === ADMIN_PASSWORD) {
+        if (password === getAdminPassword()) {
           set({ isAuthenticated: true });
           return true;
         }
