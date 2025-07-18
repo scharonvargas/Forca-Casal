@@ -1,5 +1,7 @@
 import { create } from "zustand";
 
+const DEBUG_AUDIO = import.meta.env.DEV;
+
 interface AudioState {
   backgroundMusic: HTMLAudioElement | null;
   hitSound: HTMLAudioElement | null;
@@ -35,7 +37,9 @@ export const useAudio = create<AudioState>((set, get) => ({
     set({ isMuted: newMutedState });
     
     // Log the change
-    console.log(`Sound ${newMutedState ? 'muted' : 'unmuted'}`);
+    if (DEBUG_AUDIO) {
+      console.log(`Sound ${newMutedState ? 'muted' : 'unmuted'}`);
+    }
   },
   
   playHit: () => {
@@ -43,7 +47,9 @@ export const useAudio = create<AudioState>((set, get) => ({
     if (hitSound) {
       // If sound is muted, don't play anything
       if (isMuted) {
-        console.log("Hit sound skipped (muted)");
+        if (DEBUG_AUDIO) {
+          console.log("Hit sound skipped (muted)");
+        }
         return;
       }
       
@@ -51,7 +57,9 @@ export const useAudio = create<AudioState>((set, get) => ({
       const soundClone = hitSound.cloneNode() as HTMLAudioElement;
       soundClone.volume = 0.3;
       soundClone.play().catch(error => {
-        console.log("Hit sound play prevented:", error);
+        if (DEBUG_AUDIO) {
+          console.log("Hit sound play prevented:", error);
+        }
       });
     }
   },
@@ -61,13 +69,17 @@ export const useAudio = create<AudioState>((set, get) => ({
     if (successSound) {
       // If sound is muted, don't play anything
       if (isMuted) {
-        console.log("Success sound skipped (muted)");
+        if (DEBUG_AUDIO) {
+          console.log("Success sound skipped (muted)");
+        }
         return;
       }
       
       successSound.currentTime = 0;
       successSound.play().catch(error => {
-        console.log("Success sound play prevented:", error);
+        if (DEBUG_AUDIO) {
+          console.log("Success sound play prevented:", error);
+        }
       });
     }
   }
