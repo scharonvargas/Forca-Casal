@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { useHangman } from '@/lib/stores/useHangman';
-import { usePunishments } from '@/lib/stores/usePunishments';
+import { usePunishments, type Punishment } from '@/lib/stores/usePunishments';
 import { useWords } from '@/lib/stores/useWords';
 import HangmanCanvas from './HangmanCanvas';
 import Keyboard from './Keyboard';
@@ -67,6 +67,18 @@ export default function EnhancedCoupleGame() {
 
   const { getRandomPunishment } = usePunishments();
   const { words, getRandomWord } = useWords();
+
+  const collectPunishments = (options: Punishment[], desired: number): Punishment[] => {
+    if (options.length >= desired) {
+      return options;
+    }
+
+    const punishment = getRandomPunishment();
+    if (punishment && !options.some(p => p.id === punishment.id)) {
+      options.push(punishment);
+    }
+    return collectPunishments(options, desired);
+  };
 
   const getCurrentPlayerInfo = () => currentPlayer === 1 ? player1 : player2;
   const getOtherPlayerInfo = () => currentPlayer === 1 ? player2 : player1;
@@ -141,23 +153,7 @@ export default function EnhancedCoupleGame() {
     
     // Only show punishment when match ends (someone reaches 2 wins)
     if (newPlayer1Score === 2 || newPlayer2Score === 2) {
-      // Generate 3 random punishment options
-      const options: any[] = [];
-      for (let i = 0; i < 3; i++) {
-        const punishment = getRandomPunishment();
-        if (punishment && !options.find(p => p.id === punishment.id)) {
-          options.push(punishment);
-        }
-      }
-      
-      // Ensure we have at least 3 options (fill with random if needed)
-      while (options.length < 3) {
-        const punishment = getRandomPunishment();
-        if (punishment) {
-          options.push(punishment);
-        }
-      }
-      
+      const options = collectPunishments([], 3);
       if (options.length > 0) {
         setPunishmentOptions(options);
         setShowPunishment(true);
