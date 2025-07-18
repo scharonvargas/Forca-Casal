@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useHangman } from '@/lib/stores/useHangman';
 import { useTimeConfig } from '@/lib/stores/useTimeConfig';
 import { Timer, AlertCircle } from 'lucide-react';
@@ -12,22 +12,39 @@ export default function GameTimer({ onTimeUp, onTimeChange }: GameTimerProps) {
   const { timeLeft, timeEnabled, setTimeLeft, gameState } = useHangman();
   const { config } = useTimeConfig();
   const [isWarning, setIsWarning] = useState(false);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const timeRef = useRef(timeLeft);
 
   useEffect(() => {
-    if (!timeEnabled || !config.enabled || gameState !== 'playing') return;
+    timeRef.current = timeLeft;
+  }, [timeLeft]);
 
-    const timer = setInterval(() => {
-      setTimeLeft(Math.max(0, timeLeft - 1));
-      onTimeChange?.(timeLeft - 1);
-      
-      if (timeLeft <= 1) {
+  useEffect(() => {
+    if (!timeEnabled || !config.enabled || gameState !== 'playing') {
+      return;
+    }
+
+    if (intervalRef.current) clearInterval(intervalRef.current);
+
+    intervalRef.current = setInterval(() => {
+      timeRef.current = Math.max(0, timeRef.current - 1);
+      setTimeLeft(timeRef.current);
+      onTimeChange?.(timeRef.current);
+
+      if (timeRef.current <= 0) {
+        clearInterval(intervalRef.current as NodeJS.Timeout);
+        intervalRef.current = null;
         onTimeUp();
-        return;
       }
     }, 1000);
 
-    return () => clearInterval(timer);
-  }, [timeLeft, timeEnabled, config.enabled, gameState, setTimeLeft, onTimeUp, onTimeChange]);
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, [timeEnabled, config.enabled, gameState, setTimeLeft, onTimeUp, onTimeChange]);
 
   useEffect(() => {
     setIsWarning(timeLeft <= 30 && timeLeft > 0);
