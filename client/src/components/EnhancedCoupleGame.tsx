@@ -9,6 +9,8 @@ import { useWords } from '@/lib/stores/useWords';
 import HangmanCanvas from './HangmanCanvas';
 import Keyboard from './Keyboard';
 import PunishmentModal from './PunishmentModal';
+import CoupleSetup from './CoupleSetup';
+import { useCouple } from '@/lib/stores/useCouple';
 import {
   Crown,
   Trophy,
@@ -21,24 +23,29 @@ import {
   RotateCcw,
   Lightbulb,
   Clock,
-  Play,
   RefreshCw
 } from 'lucide-react';
 import { playSound } from '@/lib/utils/playSound';
 
-interface Player {
-  name: string;
-  score: number;
-}
-
 export default function EnhancedCoupleGame() {
   // Game state
-  const [player1, setPlayer1] = useState<Player>({ name: '', score: 0 });
-  const [player2, setPlayer2] = useState<Player>({ name: '', score: 0 });
+  const {
+    player1,
+    player2,
+    setPlayerNames,
+    addScore,
+    resetGame
+  } = useCouple();
   const [currentPlayer, setCurrentPlayer] = useState<1 | 2>(1);
   const [isChallenger, setIsChallenger] = useState(true);
   const [roundNumber, setRoundNumber] = useState(1);
   const [maxRounds] = useState(3); // Melhor de 3
+
+  useEffect(() => {
+    if (player1.name && player2.name) {
+      setGamePhase('word-input');
+    }
+  }, [player1.name, player2.name]);
   
   // Game phases
   const [gamePhase, setGamePhase] = useState<'setup' | 'word-input' | 'playing' | 'result'>('setup');
@@ -105,13 +112,6 @@ export default function EnhancedCoupleGame() {
     }
   }, [gameState]);
 
-  const handleSetup = (p1Name: string, p2Name: string) => {
-    const newPlayer1 = { name: p1Name, score: 0 };
-    const newPlayer2 = { name: p2Name, score: 0 };
-    setPlayer1(newPlayer1);
-    setPlayer2(newPlayer2);
-    setGamePhase('word-input');
-  };
 
   const handleWordSet = (word: string) => {
     setSecretWord(word);
@@ -142,13 +142,13 @@ export default function EnhancedCoupleGame() {
       // Adivinhador ganhou
       winnerPlayer = 1;
       newPlayer1Score++;
-      setPlayer1(prev => ({ ...prev, score: prev.score + 1 }));
+      addScore(1);
       playSound('victory');
     } else {
       // Desafiante ganhou ou tempo esgotado
       winnerPlayer = 2;
       newPlayer2Score++;
-      setPlayer2(prev => ({ ...prev, score: prev.score + 1 }));
+      addScore(2);
       playSound('defeat');
     }
     
@@ -182,8 +182,8 @@ export default function EnhancedCoupleGame() {
   };
 
   const handleNewGame = () => {
-    setPlayer1({ name: '', score: 0 });
-    setPlayer2({ name: '', score: 0 });
+    setPlayerNames('', '');
+    resetGame();
     setCurrentPlayer(1);
     setIsChallenger(true);
     setRoundNumber(1);
@@ -249,79 +249,10 @@ export default function EnhancedCoupleGame() {
     }
   };
 
-  // Setup state for names
-  const [tempPlayer1Name, setTempPlayer1Name] = useState('');
-  const [tempPlayer2Name, setTempPlayer2Name] = useState('');
-
-  const handleSetupComplete = () => {
-    if (tempPlayer1Name.trim() && tempPlayer2Name.trim()) {
-      setPlayer1({ name: tempPlayer1Name.trim(), score: 0 });
-      setPlayer2({ name: tempPlayer2Name.trim(), score: 0 });
-      setGamePhase('word-input');
-    }
-  };
 
   // Setup Phase - Names input
   if (gamePhase === 'setup') {
-    return (
-      <div className="max-w-lg mx-auto space-y-6 p-4">
-        <Card className="bg-black/20 backdrop-blur-sm border-white/10">
-          <CardHeader className="text-center">
-            <CardTitle className="text-white text-2xl flex items-center justify-center gap-2">
-              <Heart className="h-6 w-6 text-pink-400" />
-              Jogo do Casal
-            </CardTitle>
-            <div className="text-white/70 text-sm mt-2">
-              Melhor de 3 rodadas - Digite os nomes dos jogadores
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-3">
-              <div>
-                <label className="text-white text-sm font-bold block mb-2">
-                  🧠 Nome do ADIVINHADOR:
-                </label>
-                <Input
-                  value={tempPlayer1Name}
-                  onChange={(e) => setTempPlayer1Name(e.target.value)}
-                  placeholder="Ex: Ana, João..."
-                  className="bg-green-500/10 border-green-500/30 text-white placeholder-white/50"
-                  maxLength={15}
-                />
-                <div className="text-green-300 text-xs mt-1">
-                  Vai descobrir as palavras secretas
-                </div>
-              </div>
-              
-              <div>
-                <label className="text-white text-sm font-bold block mb-2">
-                  🎯 Nome do DESAFIANTE:
-                </label>
-                <Input
-                  value={tempPlayer2Name}
-                  onChange={(e) => setTempPlayer2Name(e.target.value)}
-                  placeholder="Ex: Carlos, Maria..."
-                  className="bg-blue-500/10 border-blue-500/30 text-white placeholder-white/50"
-                  maxLength={15}
-                />
-                <div className="text-blue-300 text-xs mt-1">
-                  Vai escolher as palavras secretas
-                </div>
-              </div>
-            </div>
-            
-            <Button
-              onClick={handleSetupComplete}
-              className="w-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 py-3"
-              disabled={!tempPlayer1Name.trim() || !tempPlayer2Name.trim()}
-            >
-              <Play className="h-4 w-4 mr-2" />
-              Começar Jogo
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
+    return <CoupleSetup onComplete={() => setGamePhase('word-input')} />;
   }
 
   // Word Input Phase - Simplified
@@ -733,47 +664,6 @@ function PunishmentChoiceModal({
 }
 
 // Couple Setup Form Component
-function CoupleSetupForm({ onSetup }: { onSetup: (p1: string, p2: string) => void }) {
-  const [player1Name, setPlayer1Name] = useState('');
-  const [player2Name, setPlayer2Name] = useState('');
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (player1Name.trim() && player2Name.trim()) {
-      onSetup(player1Name.trim(), player2Name.trim());
-    }
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Input
-          value={player1Name}
-          onChange={(e) => setPlayer1Name(e.target.value)}
-          placeholder="Nome do Jogador 1..."
-          className="bg-white/10 border-white/20 text-white placeholder-white/50"
-          required
-        />
-        <Input
-          value={player2Name}
-          onChange={(e) => setPlayer2Name(e.target.value)}
-          placeholder="Nome do Jogador 2..."
-          className="bg-white/10 border-white/20 text-white placeholder-white/50"
-          required
-        />
-      </div>
-      
-      <Button
-        type="submit"
-        className="w-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700"
-        disabled={!player1Name.trim() || !player2Name.trim()}
-      >
-        <Play className="h-4 w-4 mr-2" />
-        Começar Jogo
-      </Button>
-    </form>
-  );
-}
 
 // Secret Word Input Form Component
 function SecretWordInputForm({ 

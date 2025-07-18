@@ -63,15 +63,17 @@ export default function HangmanGame() {
 
   // Update time settings when config changes
   useEffect(() => {
-    if (timeConfig.enabled && gameState === 'playing') {
-      setTimeEnabled(true);
-      if (timeLeft === 0) {
-        setTimeLeft(timeConfig.initialTime);
+    if (gameState === 'playing') {
+      if (timeConfig.enabled) {
+        setTimeEnabled(true);
+        setTimeLeft(Math.round(timeConfig.initialTime * difficulty.timeMultiplier));
+      } else {
+        setTimeEnabled(false);
       }
     } else {
       setTimeEnabled(false);
     }
-  }, [timeConfig.enabled, gameState]);
+  }, [timeConfig.enabled, timeConfig.initialTime, difficulty.timeMultiplier, gameState]);
 
   // Check for game end and show punishment for losses
   useEffect(() => {
