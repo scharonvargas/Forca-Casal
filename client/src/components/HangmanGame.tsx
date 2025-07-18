@@ -12,7 +12,9 @@ import { useWords } from "../lib/stores/useWords";
 import { useCouple } from "../lib/stores/useCouple";
 import { usePunishments, Punishment } from "../lib/stores/usePunishments";
 import { useTimeConfig } from "../lib/stores/useTimeConfig";
+import { useDifficulty, getDifficultySettings } from "../lib/stores/useDifficulty";
 import { RefreshCw, Trophy, Skull } from "lucide-react";
+import { playSound } from "../lib/utils/playSound";
 
 export default function HangmanGame() {
   const { gameMode } = useCouple();
@@ -34,6 +36,8 @@ export default function HangmanGame() {
   const { getRandomWord } = useWords();
   const { getRandomPunishment } = usePunishments();
   const { config: timeConfig } = useTimeConfig();
+  const { level } = useDifficulty();
+  const difficulty = getDifficultySettings(level);
   const [showPunishment, setShowPunishment] = useState(false);
   const [currentPunishment, setCurrentPunishment] = useState<Punishment | null>(null);
 
@@ -46,10 +50,10 @@ export default function HangmanGame() {
   useEffect(() => {
     const word = getRandomWord();
     if (word) {
-      newGame(word);
+      newGame(word, difficulty.maxWrongGuesses);
       // Initialize timer
       if (timeConfig.enabled) {
-        setTimeLeft(timeConfig.initialTime);
+        setTimeLeft(Math.round(timeConfig.initialTime * difficulty.timeMultiplier));
         setTimeEnabled(true);
       } else {
         setTimeEnabled(false);
@@ -77,11 +81,13 @@ export default function HangmanGame() {
         setCurrentPunishment(punishment);
         setShowPunishment(true);
       }
+      playSound('defeat');
     } else if (gameState === 'won') {
       // Add word completion bonus
       if (timeConfig.enabled && timeEnabled) {
         setTimeLeft(timeLeft + timeConfig.bonusPerWord);
       }
+      playSound('victory');
     }
   }, [gameState]);
 
@@ -89,6 +95,10 @@ export default function HangmanGame() {
     if (gameState === 'playing') {
       const wasCorrect = currentWord.includes(letter.toUpperCase());
       guessLetter(letter);
+
+      setTimeout(() => {
+        playSound(wasCorrect ? 'correct' : 'wrong');
+      }, 100);
       
       // Apply time bonus/penalty if time is enabled
       if (timeConfig.enabled && timeEnabled) {
@@ -104,10 +114,10 @@ export default function HangmanGame() {
   const handleNewGame = () => {
     const word = getRandomWord();
     if (word) {
-      newGame(word);
+      newGame(word, difficulty.maxWrongGuesses);
       // Reset timer for new game
       if (timeConfig.enabled) {
-        setTimeLeft(timeConfig.initialTime);
+        setTimeLeft(Math.round(timeConfig.initialTime * difficulty.timeMultiplier));
         setTimeEnabled(true);
       } else {
         setTimeEnabled(false);
@@ -122,7 +132,7 @@ export default function HangmanGame() {
       const currentState = useHangman.getState();
       useHangman.setState({ 
         ...currentState, 
-        wrongGuesses: 6,
+        wrongGuesses: difficulty.maxWrongGuesses,
         gameState: 'lost',
         stats: {
           ...currentState.stats,

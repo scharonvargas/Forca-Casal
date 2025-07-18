@@ -11,6 +11,7 @@ import HangmanCanvas from './HangmanCanvas';
 import Keyboard from './Keyboard';
 import PunishmentModal from './PunishmentModal';
 import WordHintSystem from './WordHintSystem';
+import { useDifficulty, getDifficultySettings } from '@/lib/stores/useDifficulty';
 import { 
   Crown, 
   Target, 
@@ -49,6 +50,8 @@ export default function CoupleGameInterface() {
   } = useHangman();
 
   const { getRandomPunishment } = usePunishments();
+  const { level } = useDifficulty();
+  const difficulty = getDifficultySettings(level);
 
   const [gamePhase, setGamePhase] = useState<GamePhase>('word-input');
   const [secretWord, setSecretWord] = useState('');
@@ -70,7 +73,7 @@ export default function CoupleGameInterface() {
 
   const handleWordSet = (word: string) => {
     setSecretWord(word);
-    newGame(word);
+    newGame(word, difficulty.maxWrongGuesses);
     setGamePhase('playing');
   };
 
@@ -276,7 +279,7 @@ export default function CoupleGameInterface() {
               onHintUsed={handleHintUsed}
               disabled={gameState !== 'playing'}
               hintsUsed={hintsUsed}
-              maxHints={3}
+              maxHints={difficulty.maxHints}
             />
           )}
 

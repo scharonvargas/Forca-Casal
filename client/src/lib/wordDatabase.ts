@@ -1,7 +1,9 @@
 // Palavras padrão com temática adulta para o jogo da forca
 // Este é um exemplo simplificado - em um app real, você gostaria de um banco de dados mais extenso
-export const getDefaultWords = (): string[] => {
-  return [
+export type WordCategory = 'romantico' | 'sensual' | 'acao' | 'corpo';
+
+const WORD_CATEGORIES: Record<WordCategory, string[]> = {
+  romantico: [
     // Palavras românticas/adultas temáticas (mantendo o bom gosto)
     "ROMANCE",
     "PAIXAO",
@@ -104,8 +106,17 @@ export const getDefaultWords = (): string[] => {
     "TESAO",
     "MORDIDA",
     "LAMBIDA"
-  ];
+  ],
+  sensual: ["TESAO", "EXCITACAO", "PRAZER"],
+  acao: ["MASSAGEM", "TOQUE", "SUSSURRO"],
+  corpo: ["CORPO", "PELE", "CURVAS"]
 };
+
+export const getDefaultWords = (): string[] => {
+  return Object.values(WORD_CATEGORIES).flat();
+};
+
+export const getWordsByCategory = (category: WordCategory): string[] => WORD_CATEGORIES[category];
 
 export const validateWord = (word: string): boolean => {
   const cleanWord = word.trim().toUpperCase();
