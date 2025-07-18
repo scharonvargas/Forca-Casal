@@ -1,5 +1,21 @@
 # Forca Casal
 
+codex/add-readme.md-with-project-documentation
+
+ codex/add-test-runner-and-example-test
+This project contains a client built with Vite and a Node.js server.
+
+## Running Tests
+
+Install dependencies then run:
+
+```bash
+npm test
+```
+
+This uses [Vitest](https://vitest.dev/) to run unit tests located under the `client` directory.
+=======
+
 Jogo da forca voltado para casais. Utiliza React + Vite no frontend e Express no backend.
 
 ## Requisitos
@@ -27,3 +43,5 @@ npm run build && ./build.sh
 - `NODE_ENV` &mdash; define o modo de execução (`development` ou `production`).
 - `VITE_ADMIN_PASSWORD` &mdash; senha para acessar o painel administrativo no frontend.
 
+codex/add-readme.md-with-project-documentation
+main
