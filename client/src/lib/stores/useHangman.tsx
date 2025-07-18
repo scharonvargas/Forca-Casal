@@ -15,11 +15,15 @@ interface HangmanState {
   wrongGuesses: number;
   gameState: GameState;
   stats: GameStats;
+  timeLeft: number;
+  timeEnabled: boolean;
   
   // Actions
   newGame: (word: string) => void;
   guessLetter: (letter: string) => void;
   getDisplayWord: () => string;
+  setTimeLeft: (time: number) => void;
+  setTimeEnabled: (enabled: boolean) => void;
 }
 
 export const useHangman = create<HangmanState>()(
@@ -34,6 +38,8 @@ export const useHangman = create<HangmanState>()(
         losses: 0,
         totalGames: 0
       },
+      timeLeft: 0,
+      timeEnabled: false,
 
       newGame: (word: string) => {
         set({
@@ -102,6 +108,14 @@ export const useHangman = create<HangmanState>()(
           .split('')
           .map(letter => state.guessedLetters.has(letter) ? letter : '_')
           .join(' ');
+      },
+
+      setTimeLeft: (time: number) => {
+        set({ timeLeft: time });
+      },
+
+      setTimeEnabled: (enabled: boolean) => {
+        set({ timeEnabled: enabled });
       }
     }),
     {

@@ -2,13 +2,16 @@ import React, { useState } from 'react';
 import { useAdmin } from '@/lib/stores/useAdmin';
 import { useWords } from '@/lib/stores/useWords';
 import { usePunishments, type Punishment } from '@/lib/stores/usePunishments';
+import { useTimeConfig } from '@/lib/stores/useTimeConfig';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Trash2, Eye, EyeOff, Heart, Clock } from 'lucide-react';
+import { Plus, Trash2, Eye, EyeOff, Heart, Clock, Timer, Settings } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 
 export default function AdminPanel() {
   const { isAuthenticated, login, logout } = useAdmin();
@@ -18,6 +21,12 @@ export default function AdminPanel() {
     addPunishment, 
     removePunishment 
   } = usePunishments();
+  const { 
+    config: timeConfig, 
+    updateConfig: updateTimeConfig, 
+    toggleTimeEnabled, 
+    resetToDefaults 
+  } = useTimeConfig();
 
   // Form states for words
   const [newWord, setNewWord] = useState("");
@@ -140,14 +149,18 @@ export default function AdminPanel() {
         </CardHeader>
       </Card>
 
-      {/* Tabs for Words and Punishments */}
+      {/* Tabs for Words, Punishments, and Time Config */}
       <Tabs defaultValue="words" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 bg-black/20 border-white/10">
+        <TabsList className="grid w-full grid-cols-3 bg-black/20 border-white/10">
           <TabsTrigger value="words" className="text-white data-[state=active]:bg-purple-600">
             Palavras ({words.length})
           </TabsTrigger>
           <TabsTrigger value="punishments" className="text-white data-[state=active]:bg-purple-600">
             Castigos ({punishments.length})
+          </TabsTrigger>
+          <TabsTrigger value="time" className="text-white data-[state=active]:bg-purple-600">
+            <Timer className="h-4 w-4 mr-1" />
+            Tempo
           </TabsTrigger>
         </TabsList>
 
@@ -388,6 +401,133 @@ export default function AdminPanel() {
                   Nenhum castigo adicionado ainda. Adicione alguns castigos para começar!
                 </div>
               )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Time Configuration Tab */}
+        <TabsContent value="time" className="space-y-4">
+          <Card className="bg-black/20 backdrop-blur-sm border-white/10">
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="text-white text-lg flex items-center gap-2">
+                <Settings className="h-5 w-5" />
+                Configurações de Tempo
+              </CardTitle>
+            </CardHeader>
+            
+            <CardContent className="p-4 sm:p-6 space-y-6">
+              {/* Enable/Disable Time */}
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <Label className="text-white font-medium">Tempo Habilitado</Label>
+                  <p className="text-white/60 text-sm">Ativar ou desativar o sistema de tempo no jogo</p>
+                </div>
+                <Switch
+                  checked={timeConfig.enabled}
+                  onCheckedChange={toggleTimeEnabled}
+                  className="data-[state=checked]:bg-purple-600"
+                />
+              </div>
+
+              {timeConfig.enabled && (
+                <>
+                  {/* Initial Time */}
+                  <div className="space-y-2">
+                    <Label className="text-white font-medium">Tempo Inicial (segundos)</Label>
+                    <Input
+                      type="number"
+                      value={timeConfig.initialTime}
+                      onChange={(e) => updateTimeConfig({ initialTime: parseInt(e.target.value) || 0 })}
+                      className="bg-white/10 border-white/20 text-white"
+                      placeholder="120"
+                      min="0"
+                    />
+                    <p className="text-white/60 text-sm">
+                      Tempo inicial para cada rodada (atual: {Math.floor(timeConfig.initialTime / 60)}:{(timeConfig.initialTime % 60).toString().padStart(2, '0')})
+                    </p>
+                  </div>
+
+                  {/* Bonus per correct letter */}
+                  <div className="space-y-2">
+                    <Label className="text-white font-medium">Bonus por Letra Correta (segundos)</Label>
+                    <Input
+                      type="number"
+                      value={timeConfig.bonusPerCorrect}
+                      onChange={(e) => updateTimeConfig({ bonusPerCorrect: parseInt(e.target.value) || 0 })}
+                      className="bg-white/10 border-white/20 text-white"
+                      placeholder="3"
+                      min="0"
+                    />
+                    <p className="text-white/60 text-sm">Tempo bonus adicionado quando acerta uma letra</p>
+                  </div>
+
+                  {/* Penalty per wrong letter */}
+                  <div className="space-y-2">
+                    <Label className="text-white font-medium">Penalidade por Letra Errada (segundos)</Label>
+                    <Input
+                      type="number"
+                      value={timeConfig.penaltyPerWrong}
+                      onChange={(e) => updateTimeConfig({ penaltyPerWrong: parseInt(e.target.value) || 0 })}
+                      className="bg-white/10 border-white/20 text-white"
+                      placeholder="5"
+                      min="0"
+                    />
+                    <p className="text-white/60 text-sm">Tempo perdido quando erra uma letra</p>
+                  </div>
+
+                  {/* Bonus per complete word */}
+                  <div className="space-y-2">
+                    <Label className="text-white font-medium">Bonus por Palavra Completa (segundos)</Label>
+                    <Input
+                      type="number"
+                      value={timeConfig.bonusPerWord}
+                      onChange={(e) => updateTimeConfig({ bonusPerWord: parseInt(e.target.value) || 0 })}
+                      className="bg-white/10 border-white/20 text-white"
+                      placeholder="15"
+                      min="0"
+                    />
+                    <p className="text-white/60 text-sm">Bonus extra quando completa uma palavra</p>
+                  </div>
+                </>
+              )}
+
+              {/* Reset to defaults */}
+              <div className="pt-4 border-t border-white/10">
+                <Button
+                  onClick={resetToDefaults}
+                  variant="outline"
+                  className="text-white border-white/20 hover:bg-white/10"
+                >
+                  <Settings className="h-4 w-4 mr-2" />
+                  Restaurar Padrões
+                </Button>
+              </div>
+
+              {/* Current Settings Preview */}
+              <div className="mt-6 p-4 bg-white/5 rounded-lg border border-white/10">
+                <h4 className="text-white font-medium mb-2">Configuração Atual:</h4>
+                <div className="space-y-1 text-sm">
+                  <p className="text-white/80">
+                    <span className="text-purple-300">Status:</span> {timeConfig.enabled ? 'Habilitado' : 'Desabilitado'}
+                  </p>
+                  {timeConfig.enabled && (
+                    <>
+                      <p className="text-white/80">
+                        <span className="text-purple-300">Tempo Inicial:</span> {Math.floor(timeConfig.initialTime / 60)}:{(timeConfig.initialTime % 60).toString().padStart(2, '0')}
+                      </p>
+                      <p className="text-white/80">
+                        <span className="text-purple-300">Bonus por Acerto:</span> +{timeConfig.bonusPerCorrect}s
+                      </p>
+                      <p className="text-white/80">
+                        <span className="text-purple-300">Penalidade por Erro:</span> -{timeConfig.penaltyPerWrong}s
+                      </p>
+                      <p className="text-white/80">
+                        <span className="text-purple-300">Bonus por Palavra:</span> +{timeConfig.bonusPerWord}s
+                      </p>
+                    </>
+                  )}
+                </div>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

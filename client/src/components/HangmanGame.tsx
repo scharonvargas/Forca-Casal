@@ -6,10 +6,12 @@ import Keyboard from "./Keyboard";
 import GameStats from "./GameStats";
 import PunishmentModal from "./PunishmentModal";
 import EnhancedCoupleGame from "./EnhancedCoupleGame";
+import GameTimer from "./GameTimer";
 import { useHangman } from "../lib/stores/useHangman";
 import { useWords } from "../lib/stores/useWords";
 import { useCouple } from "../lib/stores/useCouple";
 import { usePunishments, Punishment } from "../lib/stores/usePunishments";
+import { useTimeConfig } from "../lib/stores/useTimeConfig";
 import { RefreshCw, Trophy, Skull } from "lucide-react";
 
 export default function HangmanGame() {
@@ -22,11 +24,16 @@ export default function HangmanGame() {
     gameState,
     guessLetter,
     newGame,
-    getDisplayWord
+    getDisplayWord,
+    setTimeLeft,
+    setTimeEnabled,
+    timeLeft,
+    timeEnabled
   } = useHangman();
   
   const { getRandomWord } = useWords();
   const { getRandomPunishment } = usePunishments();
+  const { config: timeConfig } = useTimeConfig();
   const [showPunishment, setShowPunishment] = useState(false);
   const [currentPunishment, setCurrentPunishment] = useState<Punishment | null>(null);
 
@@ -40,8 +47,27 @@ export default function HangmanGame() {
     const word = getRandomWord();
     if (word) {
       newGame(word);
+      // Initialize timer
+      if (timeConfig.enabled) {
+        setTimeLeft(timeConfig.initialTime);
+        setTimeEnabled(true);
+      } else {
+        setTimeEnabled(false);
+      }
     }
   }, []);
+
+  // Update time settings when config changes
+  useEffect(() => {
+    if (timeConfig.enabled && gameState === 'playing') {
+      setTimeEnabled(true);
+      if (timeLeft === 0) {
+        setTimeLeft(timeConfig.initialTime);
+      }
+    } else {
+      setTimeEnabled(false);
+    }
+  }, [timeConfig.enabled, gameState]);
 
   // Check for game end and show punishment for losses
   useEffect(() => {
@@ -51,12 +77,27 @@ export default function HangmanGame() {
         setCurrentPunishment(punishment);
         setShowPunishment(true);
       }
+    } else if (gameState === 'won') {
+      // Add word completion bonus
+      if (timeConfig.enabled && timeEnabled) {
+        setTimeLeft(timeLeft + timeConfig.bonusPerWord);
+      }
     }
   }, [gameState]);
 
   const handleLetterGuess = (letter: string) => {
     if (gameState === 'playing') {
+      const wasCorrect = currentWord.includes(letter.toUpperCase());
       guessLetter(letter);
+      
+      // Apply time bonus/penalty if time is enabled
+      if (timeConfig.enabled && timeEnabled) {
+        if (wasCorrect) {
+          setTimeLeft(timeLeft + timeConfig.bonusPerCorrect);
+        } else {
+          setTimeLeft(Math.max(0, timeLeft - timeConfig.penaltyPerWrong));
+        }
+      }
     }
   };
 
@@ -64,6 +105,31 @@ export default function HangmanGame() {
     const word = getRandomWord();
     if (word) {
       newGame(word);
+      // Reset timer for new game
+      if (timeConfig.enabled) {
+        setTimeLeft(timeConfig.initialTime);
+        setTimeEnabled(true);
+      } else {
+        setTimeEnabled(false);
+      }
+    }
+  };
+
+  const handleTimeUp = () => {
+    // Force game to end when time runs out
+    if (gameState === 'playing') {
+      // Simulate max wrong guesses to end game
+      const currentState = useHangman.getState();
+      useHangman.setState({ 
+        ...currentState, 
+        wrongGuesses: 6,
+        gameState: 'lost',
+        stats: {
+          ...currentState.stats,
+          losses: currentState.stats.losses + 1,
+          totalGames: currentState.stats.totalGames + 1
+        }
+      });
     }
   };
 
@@ -110,6 +176,13 @@ export default function HangmanGame() {
                   "Adivinhe a Palavra"
                 )}
               </CardTitle>
+              
+              {/* Game Timer */}
+              {timeConfig.enabled && (
+                <div className="flex justify-center mt-4">
+                  <GameTimer onTimeUp={handleTimeUp} />
+                </div>
+              )}
             </CardHeader>
 
             <CardContent className="space-y-4 lg:space-y-6 p-4 lg:p-6">
