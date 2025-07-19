@@ -21,12 +21,33 @@ export default function AdminPanel() {
     addPunishment, 
     removePunishment 
   } = usePunishments();
-  const { 
-    config: timeConfig, 
-    updateConfig: updateTimeConfig, 
-    toggleTimeEnabled, 
-    resetToDefaults 
+  const {
+    config: timeConfig,
+    updateConfig: updateTimeConfig,
+    toggleTimeEnabled,
+    resetToDefaults
   } = useTimeConfig();
+
+  // Helpers to update numeric fields safely
+  const handleInitialTimeChange = (value: string) => {
+    const parsed = Number(value);
+    updateTimeConfig({ initialTime: Number.isFinite(parsed) ? parsed : 0 });
+  };
+
+  const handleBonusCorrectChange = (value: string) => {
+    const parsed = Number(value);
+    updateTimeConfig({ bonusPerCorrect: Number.isFinite(parsed) ? parsed : 0 });
+  };
+
+  const handlePenaltyWrongChange = (value: string) => {
+    const parsed = Number(value);
+    updateTimeConfig({ penaltyPerWrong: Number.isFinite(parsed) ? parsed : 0 });
+  };
+
+  const handleBonusWordChange = (value: string) => {
+    const parsed = Number(value);
+    updateTimeConfig({ bonusPerWord: Number.isFinite(parsed) ? parsed : 0 });
+  };
 
   // Form states for words
   const [newWord, setNewWord] = useState("");
@@ -434,14 +455,14 @@ export default function AdminPanel() {
                   {/* Initial Time */}
                   <div className="space-y-2">
                     <Label className="text-white font-medium">Tempo Inicial (segundos)</Label>
-                    <Input
-                      type="number"
-                      value={timeConfig.initialTime}
-                      onChange={(e) => updateTimeConfig({ initialTime: parseInt(e.target.value) || 0 })}
-                      className="bg-white/10 border-white/20 text-white"
-                      placeholder="120"
-                      min="0"
-                    />
+                  <Input
+                    type="number"
+                    value={timeConfig.initialTime}
+                    onChange={(e) => handleInitialTimeChange(e.target.value)}
+                    className="bg-white/10 border-white/20 text-white"
+                    placeholder="120"
+                    min="0"
+                  />
                     <p className="text-white/60 text-sm">
                       Tempo inicial para cada rodada (atual: {Math.floor(timeConfig.initialTime / 60)}:{(timeConfig.initialTime % 60).toString().padStart(2, '0')})
                     </p>
@@ -450,42 +471,42 @@ export default function AdminPanel() {
                   {/* Bonus per correct letter */}
                   <div className="space-y-2">
                     <Label className="text-white font-medium">Bonus por Letra Correta (segundos)</Label>
-                    <Input
-                      type="number"
-                      value={timeConfig.bonusPerCorrect}
-                      onChange={(e) => updateTimeConfig({ bonusPerCorrect: parseInt(e.target.value) || 0 })}
-                      className="bg-white/10 border-white/20 text-white"
-                      placeholder="3"
-                      min="0"
-                    />
+                  <Input
+                    type="number"
+                    value={timeConfig.bonusPerCorrect}
+                    onChange={(e) => handleBonusCorrectChange(e.target.value)}
+                    className="bg-white/10 border-white/20 text-white"
+                    placeholder="3"
+                    min="0"
+                  />
                     <p className="text-white/60 text-sm">Tempo bonus adicionado quando acerta uma letra</p>
                   </div>
 
                   {/* Penalty per wrong letter */}
                   <div className="space-y-2">
                     <Label className="text-white font-medium">Penalidade por Letra Errada (segundos)</Label>
-                    <Input
-                      type="number"
-                      value={timeConfig.penaltyPerWrong}
-                      onChange={(e) => updateTimeConfig({ penaltyPerWrong: parseInt(e.target.value) || 0 })}
-                      className="bg-white/10 border-white/20 text-white"
-                      placeholder="5"
-                      min="0"
-                    />
+                  <Input
+                    type="number"
+                    value={timeConfig.penaltyPerWrong}
+                    onChange={(e) => handlePenaltyWrongChange(e.target.value)}
+                    className="bg-white/10 border-white/20 text-white"
+                    placeholder="5"
+                    min="0"
+                  />
                     <p className="text-white/60 text-sm">Tempo perdido quando erra uma letra</p>
                   </div>
 
                   {/* Bonus per complete word */}
                   <div className="space-y-2">
                     <Label className="text-white font-medium">Bonus por Palavra Completa (segundos)</Label>
-                    <Input
-                      type="number"
-                      value={timeConfig.bonusPerWord}
-                      onChange={(e) => updateTimeConfig({ bonusPerWord: parseInt(e.target.value) || 0 })}
-                      className="bg-white/10 border-white/20 text-white"
-                      placeholder="15"
-                      min="0"
-                    />
+                  <Input
+                    type="number"
+                    value={timeConfig.bonusPerWord}
+                    onChange={(e) => handleBonusWordChange(e.target.value)}
+                    className="bg-white/10 border-white/20 text-white"
+                    placeholder="15"
+                    min="0"
+                  />
                     <p className="text-white/60 text-sm">Bonus extra quando completa uma palavra</p>
                   </div>
                 </>
