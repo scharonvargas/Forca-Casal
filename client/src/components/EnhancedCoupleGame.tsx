@@ -389,107 +389,112 @@ export default function EnhancedCoupleGame() {
 
 
 
-      {/* FORCA NO TOPO - Layout Mobile */}
-      <div className="space-y-2">
-        {/* 1. FORCA SEMPRE NO TOPO - MAIOR E MAIS DESTACADA */}
-        <Card className="bg-black/20 backdrop-blur-sm border-white/10">
-          <CardContent className="p-2">
-            <div className="flex justify-center">
-              <div className="w-72 h-72 md:w-80 md:h-80">
-                <HangmanCanvas wrongGuesses={wrongGuesses} />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      {/* LAYOUT PRINCIPAL */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+        {/* COLUNA ESQUERDA: DICAS + FORCA */}
+        <div className="space-y-2">
+          {gameState === 'playing' && (
+            <Card className="bg-black/20 backdrop-blur-sm border-white/10">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-white flex items-center justify-center gap-2">
+                  <Lightbulb className="h-5 w-5 text-yellow-400" />
+                  💡 Dicas ({hintsUsed}/3)
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {revealedHints.map((hint, index) => (
+                  <div key={index} className="p-3 bg-green-500/20 border border-green-500/50 rounded-lg text-green-300">
+                    {hint}
+                  </div>
+                ))}
 
-        {/* 2. PALAVRA SECRETA - MAIS COMPACTA */}
-        <Card className="bg-black/20 backdrop-blur-sm border-white/10">
-          <CardContent className="p-3 text-center">
-            <div className="mb-2">
-              <div className="text-white/70 text-xs mb-1">Palavra Secreta:</div>
-              <div className="text-xl md:text-2xl font-mono text-white tracking-widest bg-white/10 rounded-lg p-3">
-                {getDisplayWord()}
-              </div>
-            </div>
-            
-            <div className="flex items-center justify-center gap-3 text-xs">
-              <div>
-                <Heart className="h-3 w-3 text-red-400 inline mr-1" />
-                <span className="text-white">Erros: {wrongGuesses}/6</span>
-              </div>
-              <div>
-                <span className={`px-2 py-1 rounded text-xs ${
-                  gameState === 'playing' ? 'bg-green-500/20 text-green-300' :
-                  gameState === 'won' ? 'bg-blue-500/20 text-blue-300' :
-                  'bg-red-500/20 text-red-300'
-                }`}>
-                  {gameState === 'playing' ? 'Jogando' :
-                   gameState === 'won' ? 'Ganhou!' : 'Perdeu!'}
-                </span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+                {hintsUsed < 3 && (
+                  <Button
+                    onClick={handleUseHint}
+                    className="w-full bg-yellow-600 hover:bg-yellow-700 py-3 text-sm flex items-center justify-center gap-2"
+                    disabled={!timerActive}
+                  >
+                    <Clock className="h-4 w-4" />
+                    <span>Usar Dica (-10s)</span>
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
+          )}
 
-        {/* 3. TECLADO - SEMPRE VISÍVEL */}
-        <Card className="bg-black/20 backdrop-blur-sm border-white/10">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-white text-center">
-              🎯 Escolha uma letra
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Keyboard
-              onLetterClick={handleLetterGuess}
-              guessedLetters={guessedLetters}
-              currentWord={currentWord}
-              disabled={gameState !== 'playing' || !timerActive}
-            />
-            
-            <div className="mt-4 space-y-2">
-              <div className="text-center py-2 bg-green-500/10 rounded-lg">
-                <p className="text-green-300 text-sm">
-                  💡 Clique nas letras para adivinhar a palavra!
-                </p>
-              </div>
-              <div className="text-center py-2 bg-blue-500/10 rounded-lg">
-                <p className="text-blue-300 text-xs">
-                  🎮 REGRAS: ADIVINHADOR descobre a palavra | DESAFIANTE escolhe a palavra | Melhor de 3 rodadas
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* 4. DICAS */}
-        {gameState === 'playing' && (
+          {/* FORCA */}
           <Card className="bg-black/20 backdrop-blur-sm border-white/10">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-white flex items-center justify-center gap-2">
-                <Lightbulb className="h-5 w-5 text-yellow-400" />
-                💡 Dicas ({hintsUsed}/3)
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {revealedHints.map((hint, index) => (
-                <div key={index} className="p-3 bg-green-500/20 border border-green-500/50 rounded-lg text-green-300">
-                  {hint}
+            <CardContent className="p-2">
+              <div className="flex justify-center">
+                <div className="w-72 h-72 md:w-80 md:h-80">
+                  <HangmanCanvas wrongGuesses={wrongGuesses} />
                 </div>
-              ))}
-              
-              {hintsUsed < 3 && (
-                <Button
-                  onClick={handleUseHint}
-                  className="w-full bg-yellow-600 hover:bg-yellow-700 py-3 text-sm flex items-center justify-center gap-2"
-                  disabled={!timerActive}
-                >
-                  <Clock className="h-4 w-4" />
-                  <span>Usar Dica (-10s)</span>
-                </Button>
-              )}
+              </div>
             </CardContent>
           </Card>
-        )}
+        </div>
+
+        {/* COLUNA DIREITA: PALAVRA + TECLADO */}
+        <div className="space-y-2">
+          {/* PALAVRA SECRETA */}
+          <Card className="bg-black/20 backdrop-blur-sm border-white/10">
+            <CardContent className="p-3 text-center">
+              <div className="mb-2">
+                <div className="text-white/70 text-xs mb-1">Palavra Secreta:</div>
+                <div className="text-xl md:text-2xl font-mono text-white tracking-widest bg-white/10 rounded-lg p-3">
+                  {getDisplayWord()}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-center gap-3 text-xs">
+                <div>
+                  <Heart className="h-3 w-3 text-red-400 inline mr-1" />
+                  <span className="text-white">Erros: {wrongGuesses}/6</span>
+                </div>
+                <div>
+                  <span className={`px-2 py-1 rounded text-xs ${
+                    gameState === 'playing' ? 'bg-green-500/20 text-green-300' :
+                    gameState === 'won' ? 'bg-blue-500/20 text-blue-300' :
+                    'bg-red-500/20 text-red-300'
+                  }`}>
+                    {gameState === 'playing' ? 'Jogando' :
+                     gameState === 'won' ? 'Ganhou!' : 'Perdeu!'}
+                  </span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* TECLADO */}
+          <Card className="bg-black/20 backdrop-blur-sm border-white/10">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-white text-center">
+                🎯 Escolha uma letra
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Keyboard
+                onLetterClick={handleLetterGuess}
+                guessedLetters={guessedLetters}
+                currentWord={currentWord}
+                disabled={gameState !== 'playing' || !timerActive}
+              />
+
+              <div className="mt-4 space-y-2">
+                <div className="text-center py-2 bg-green-500/10 rounded-lg">
+                  <p className="text-green-300 text-sm">
+                    💡 Clique nas letras para adivinhar a palavra!
+                  </p>
+                </div>
+                <div className="text-center py-2 bg-blue-500/10 rounded-lg">
+                  <p className="text-blue-300 text-xs">
+                    🎮 REGRAS: ADIVINHADOR descobre a palavra | DESAFIANTE escolhe a palavra | Melhor de 3 rodadas
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       {/* Game Result */}
