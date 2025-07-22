@@ -30,7 +30,12 @@ export default function HangmanGame() {
     setTimeLeft,
     setTimeEnabled,
     timeLeft,
-    timeEnabled
+    timeEnabled,
+    currentHint,
+    hintsUsed,
+    maxHints,
+    useHint,
+    setCurrentHint,
   } = useHangman();
   
   const { getRandomWord } = useWords();
@@ -92,6 +97,26 @@ export default function HangmanGame() {
       playSound('victory');
     }
   }, [gameState]);
+
+  // Fetch hint when word changes
+  useEffect(() => {
+    if (currentWord && gameState === 'playing') {
+      fetchHint();
+    }
+  }, [currentWord]);
+
+  const fetchHint = async () => {
+    try {
+      const response = await fetch(`/api/words/hint/${encodeURIComponent(currentWord)}`);
+      if (response.ok) {
+        const data = await response.json();
+        setCurrentHint(data.hint || 'Sem dica disponível');
+      }
+    } catch (error) {
+      console.error('Erro ao buscar dica:', error);
+      setCurrentHint('Sem dica disponível');
+    }
+  };
 
   const handleLetterGuess = (letter: string) => {
     if (gameState === 'playing') {
