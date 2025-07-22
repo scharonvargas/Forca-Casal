@@ -20,6 +20,9 @@ interface HangmanState {
   stats: GameStats;
   timeLeft: number;
   timeEnabled: boolean;
+  currentHint: string;
+  hintsUsed: number;
+  maxHints: number;
   
   // Actions
   newGame: (word: string, maxGuesses?: number) => void;
@@ -28,6 +31,8 @@ interface HangmanState {
   setTimeLeft: (time: number) => void;
   setTimeEnabled: (enabled: boolean) => void;
   setMaxWrongGuesses: (max: number) => void;
+  useHint: () => void;
+  setCurrentHint: (hint: string) => void;
 }
 
 export const useHangman = create<HangmanState>()(
@@ -35,18 +40,21 @@ export const useHangman = create<HangmanState>()(
     (set, get) => ({
       currentWord: "",
       guessedLetters: new Set(),
-    wrongGuesses: 0,
-    maxWrongGuesses: 6,
-    gameState: 'playing',
-    stats: {
-      wins: 0,
-      losses: 0,
-      totalGames: 0,
-      bestStreak: 0,
-      currentStreak: 0
-    },
+      wrongGuesses: 0,
+      maxWrongGuesses: 6,
+      gameState: 'playing',
+      stats: {
+        wins: 0,
+        losses: 0,
+        totalGames: 0,
+        bestStreak: 0,
+        currentStreak: 0
+      },
       timeLeft: 0,
       timeEnabled: false,
+      currentHint: '',
+      hintsUsed: 0,
+      maxHints: 3,
 
       newGame: (word: string, maxGuesses = get().maxWrongGuesses) => {
         set({
@@ -54,7 +62,9 @@ export const useHangman = create<HangmanState>()(
           guessedLetters: new Set(),
           wrongGuesses: 0,
           maxWrongGuesses: maxGuesses,
-          gameState: 'playing'
+          gameState: 'playing',
+          currentHint: '',
+          hintsUsed: 0,
         });
       },
 
@@ -132,7 +142,16 @@ export const useHangman = create<HangmanState>()(
 
       setMaxWrongGuesses: (max: number) => {
         set({ maxWrongGuesses: max });
-      }
+      },
+
+      useHint: () => {
+        const state = get();
+        if (state.hintsUsed < state.maxHints && state.gameState === 'playing') {
+          set({ hintsUsed: state.hintsUsed + 1 });
+        }
+      },
+
+      setCurrentHint: (hint: string) => set({ currentHint: hint }),
     }),
     {
       name: 'hangman-game',
