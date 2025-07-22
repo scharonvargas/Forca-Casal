@@ -7,6 +7,7 @@ import GameStats from "./GameStats";
 import PunishmentModal from "./PunishmentModal";
 import EnhancedCoupleGame from "./EnhancedCoupleGame";
 import GameTimer from "./GameTimer";
+import WordHintSystem from "./WordHintSystem";
 import { useHangman } from "../lib/stores/useHangman";
 import { useWords } from "../lib/stores/useWords";
 import { useCouple } from "../lib/stores/useCouple";
@@ -18,7 +19,7 @@ import { playSound } from "../lib/utils/playSound";
 
 export default function HangmanGame() {
   const { gameMode } = useCouple();
-  
+
   const {
     currentWord,
     guessedLetters,
@@ -157,8 +158,8 @@ export default function HangmanGame() {
     if (gameState === 'playing') {
       // Simulate max wrong guesses to end game
       const currentState = useHangman.getState();
-      useHangman.setState({ 
-        ...currentState, 
+      useHangman.setState({
+        ...currentState,
         wrongGuesses: difficulty.maxWrongGuesses,
         gameState: 'lost',
         stats: {
@@ -168,6 +169,15 @@ export default function HangmanGame() {
         }
       });
     }
+  };
+
+  const handleHintUsed = (penalty: number) => {
+    useHint();
+    // Apply time penalty if time is enabled
+    if (timeConfig.enabled && timeEnabled) {
+      setTimeLeft(Math.max(0, timeLeft - (penalty * 10))); // 10 seconds per penalty point
+    }
+    playSound('correct'); // Use 'correct' sound for hints since 'hint' is not available
   };
 
   const getGameMessage = () => {
@@ -239,6 +249,19 @@ export default function HangmanGame() {
                   Erros: {wrongGuesses}/6
                 </div>
               </div>
+
+              {/* Hint System - Only show during gameplay */}
+              {gameState === 'playing' && currentWord && (
+                <div className="w-full">
+                  <WordHintSystem
+                    word={currentWord}
+                    onHintUsed={handleHintUsed}
+                    disabled={gameState !== 'playing'}
+                    hintsUsed={hintsUsed}
+                    maxHints={maxHints}
+                  />
+                </div>
+              )}
 
               {/* Keyboard */}
               <div className="w-full">
