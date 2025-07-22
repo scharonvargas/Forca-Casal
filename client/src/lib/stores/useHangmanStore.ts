@@ -1,3 +1,6 @@
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+
 interface HangmanState {
   // ... existing properties
   currentHint: string;

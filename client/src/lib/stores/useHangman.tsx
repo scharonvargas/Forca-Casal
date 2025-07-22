@@ -23,8 +23,9 @@ interface HangmanState {
   currentHint: string;
   hintsUsed: number;
   maxHints: number;
-  
-  // Actions
+}
+
+interface HangmanActions {
   newGame: (word: string, maxGuesses?: number) => void;
   guessLetter: (letter: string) => void;
   getDisplayWord: () => string;
@@ -35,7 +36,7 @@ interface HangmanState {
   setCurrentHint: (hint: string) => void;
 }
 
-export const useHangman = create<HangmanState>()(
+export const useHangman = create<HangmanState & HangmanActions>()(
   persist(
     (set, get) => ({
       currentWord: "",
